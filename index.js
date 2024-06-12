@@ -37,10 +37,6 @@ app.get("/fail", (req, res) => {
   throw new Error("Nope!");
 });
 
-app.use((err, req, res, next) => {
-  console.log(err);
-});
-
 // 404 Page
 app.use((req, res) => {
   res.type("text/plain");
