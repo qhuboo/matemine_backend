@@ -1,7 +1,27 @@
 const express = require("express");
 const app = express();
+const morgan = require('morgan');
+const fs = require ('node:fs');
 
 const PORT = 8080;
+
+// Ensure the server trusts the proxy
+app.set('trust proxy', true);
+
+// Define a new Morgan token to extract the IP
+morgan.token('remote-addr', function (req){
+	return req.headers['x-forwarded-for'] || req.ip;
+});
+
+switch(app.get('env')){
+	case 'development':
+		app.use(morgan(':remote-addr - :method :url :status :response-time ms - :res[content-length]'));
+		break;
+	case 'production':
+		const stream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'});
+		app.use(morgan('combined', {stream}));
+		break;
+}
 
 app.get("/", (req, res) => {
   res.end("This is the matemine backend");
