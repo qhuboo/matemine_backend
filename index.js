@@ -37,6 +37,24 @@ app.get("/fail", (req, res) => {
   throw new Error("Nope!");
 });
 
+app.get("/epic-fail", (req, res) => {
+  process.nextTick(() => {
+    throw new Error("KABOOM!");
+  });
+});
+
+app.use((err, req, res, next) => {
+  console.log(err);
+  if (!res.headersSent) {
+    res.status(500).send("Interval Server Error");
+  }
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception\n", err.stack);
+  process.exit(1);
+});
+
 // 404 Page
 app.use((req, res) => {
   res.type("text/plain");
