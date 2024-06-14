@@ -1,5 +1,6 @@
 const { query } = require("express");
 const client = require("./db-client");
+const seed = require("./seedGameData");
 
 const createTablesQueries = [
   `CREATE TABLE IF NOT EXISTS users(
@@ -67,28 +68,37 @@ const createTablesQueries = [
 
 async function createTables() {
   try {
+    // Execute each query
+    for (const query of createTablesQueries) {
+      console.log(`Running query... ${query}`);
+      await client.query(query);
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function init() {
+  try {
     // Connect client
     client.connect();
 
     // Start the transaction
     await client.query("BEGIN");
 
-    // Execute each query
-    for (const query of createTablesQueries) {
-      console.log(`Running query... ${query}`);
-      await client.query(query);
-    }
+    await createTables();
+    await seed();
 
     // Commit the transaction
     await client.query("COMMIT");
   } catch (error) {
-    console.error(error);
+    console.log(error);
     // Rollback if there is an error
     await client.query("ROLLBACK");
   } finally {
-    console.log("done");
+    console.log("done.");
     client.end();
   }
 }
 
-createTables();
+init();
