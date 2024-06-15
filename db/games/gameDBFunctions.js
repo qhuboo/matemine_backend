@@ -69,26 +69,42 @@ async function getGameByTitle(game_title) {
   }
 }
 
-async function deleteGame(game_id) {
+async function getPlatformId(platform_name) {
   try {
-    const response = await db.query(
-      `UPDATE games SET available=false WHERE game_id = $1`,
-      [game_id]
+    const id = await db.query(
+      "SELECT platform_id FROM platforms WHERE platform_name = $1",
+      [platform_name]
     );
-    // TODO: verify that the game is indeed no longer available and return 0, throw an error otherwise
-    return response;
+    if (id.length === 0) {
+      throw new Error(
+        `Error getting the platform_id for platform with name: ${platform_name}`
+      );
+    }
+    return id[0].platform_id;
   } catch (error) {
     throw error;
   }
 }
 
-async function main() {
+async function getGameScreenshots(game_id) {
   try {
-    const response = await deleteGame(15);
-    console.log(response);
+    const screenshots = await db.query(
+      "SELECT g.game_id, g.description, g.title, g.price, g.sample_cover_image, gs.caption, gs.image FROM games g JOIN game_screenshots gs ON g.game_id = gs.game_id WHERE g.game_id = $1",
+      [game_id]
+    );
+    console.log(screenshots);
+    return screenshots;
   } catch (error) {
-    console.log(error);
+    throw error;
   }
 }
 
-main();
+module.exports = {
+  getAllGames,
+  getAllAvailableGames,
+  getGamesByPlatform,
+  getGameById,
+  getGameByTitle,
+  getPlatformId,
+  getGameScreenshots,
+};
