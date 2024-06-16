@@ -3,15 +3,17 @@ const app = express();
 
 const PORT = 8080;
 
-const { getAllGames } = require("./db/games/gameDBFunctions");
+const games = require("./routes/gameRoutes");
 
 // Ensure the server trusts the proxy
 app.set("trust proxy", true);
 
-app.get("/games", async (req, res) => {
-  const games = await getAllGames();
-  res.json(games);
+app.get("/", async (req, res) => {
+  res.send("This is the main api route");
 });
+
+app.use("/games", games);
+// app.use("/users", users);
 
 app.use((req, res) => {
   res.type("text/plain");
