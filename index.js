@@ -9,7 +9,7 @@ const games = require("./routes/gameRoutes");
 app.set("trust proxy", true);
 
 app.get("/", async (req, res) => {
-  res.send("This is the main api route");
+  res.send("Hello Bangal");
 });
 
 app.use("/games", games);
