@@ -21,4 +21,49 @@ router.get("/available", async (req, res) => {
   }
 });
 
+router.get("/platform/:platform_id", async (req, res) => {
+  try {
+    const response = await games.getGamesByPlatform(req.params.platform_id);
+    res.json(response);
+  } catch (error) {
+    throw error;
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const response = await games.getGameById(req.params.id);
+    res.json(response);
+  } catch (error) {
+    throw error;
+  }
+});
+
+router.get("/:title", async (req, res) => {
+  try {
+    const response = await games.getGameByTitle(req.params.title);
+    res.json(response);
+  } catch (error) {
+    throw error;
+  }
+});
+
+router.get("/platforms/:platform_name", async (req, res) => {
+  try {
+    const response = await games.getPlatformId(req.params.platform_name);
+    res.json(response);
+  } catch (error) {
+    throw error;
+  }
+});
+
+router.get("/screenshots/:game_id", async (req, res) => {
+  try {
+    const response = await games.getGameScreenshots(req.params.game_id);
+    res.json(response);
+  } catch (error) {
+    throw error;
+  }
+});
+
 module.exports = router;
