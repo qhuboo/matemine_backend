@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 
 const PORT = 8080;
 
@@ -7,6 +8,8 @@ const games = require("./routes/gameRoutes");
 
 // Ensure the server trusts the proxy
 app.set("trust proxy", true);
+
+app.use(cors());
 
 app.get("/", async (req, res) => {
   res.send("Hello Bangal");
