@@ -2,7 +2,7 @@ const db = require("../db-pool");
 
 async function getAllGames() {
   try {
-    const games = await db.query("SELECT * FROM games");
+    const games = await db.query("SELECT * FROM games LIMIT 30");
     if (games.length === 0) {
       throw new Error("Error finding games");
     }
