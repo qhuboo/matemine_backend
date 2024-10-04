@@ -5,6 +5,7 @@ const cors = require("cors");
 const PORT = 8080;
 
 const games = require("./routes/gameRoutes");
+const users = require("./routes/userRoutes");
 
 // Ensure the server trusts the proxy
 app.set("trust proxy", true);
@@ -12,11 +13,11 @@ app.set("trust proxy", true);
 app.use(cors());
 
 app.get("/", async (req, res) => {
-  res.send("Hello Bangal");
+  res.send("Hello");
 });
 
 app.use("/games", games);
-// app.use("/users", users);
+app.use("/users", users);
 
 app.use((req, res) => {
   res.type("text/plain");
