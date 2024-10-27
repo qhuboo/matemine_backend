@@ -12,6 +12,8 @@ app.set("trust proxy", true);
 
 app.use(cors());
 
+app.use(express.json());
+
 app.get("/", async (req, res) => {
   res.send("Hello");
 });
