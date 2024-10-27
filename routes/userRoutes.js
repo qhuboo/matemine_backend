@@ -7,7 +7,7 @@ router.post("/register", (req, res) => {
 
 router.post("/signin", (req, res) => {
   console.log(req.body);
-  res.send("The request made it");
+  res.json({ message: "the request made it" });
 });
 
 module.exports = router;
