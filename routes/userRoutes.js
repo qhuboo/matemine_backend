@@ -6,7 +6,9 @@ router.post("/register", (req, res) => {
 });
 
 router.post("/signin", (req, res) => {
-  console.log(req.body);
+  console.log(req.body.email);
+  console.log(req.body.password);
+
   res.json({ message: "the request made it" });
 });
 
