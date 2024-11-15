@@ -6,11 +6,6 @@ router.post("/register", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
-  console.log(req.body.email);
-  console.log(req.body.password);
-
-  // Some sql logic to check password hash and email
-
   const error = false;
   // const error = true;
   if (!error) {
