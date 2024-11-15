@@ -92,7 +92,6 @@ async function getGameScreenshots(game_id) {
       "SELECT g.game_id, g.description, g.title, g.price, g.sample_cover_image, gs.caption, gs.image FROM games g JOIN game_screenshots gs ON g.game_id = gs.game_id WHERE g.game_id = $1",
       [game_id]
     );
-    console.log(screenshots);
     return screenshots;
   } catch (error) {
     throw error;
