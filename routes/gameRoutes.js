@@ -8,6 +8,10 @@ router.get("/", async (req, res) => {
     console.log("Hit");
     console.log(req.query.platforms);
     console.log(req.query.consoles);
+    const decodedConsoles = Buffer.from(req.query.platforms, "base64").toString(
+      "binary"
+    );
+    console.log(decodedConsoles);
     const response = await games.getAllGames();
     res.json(response);
   } catch (error) {
