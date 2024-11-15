@@ -6,6 +6,7 @@ const games = require("../db/games/gameDBFunctions");
 router.get("/", async (req, res) => {
   try {
     console.log("Hit");
+    console.log(req.query);
     const response = await games.getAllGames();
     res.json(response);
   } catch (error) {
