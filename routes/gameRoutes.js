@@ -6,16 +6,17 @@ const games = require("../db/games/gameDBFunctions");
 router.get("/", async (req, res) => {
   try {
     console.log("Hit");
-    if (req.query.platforms) {
-      console.log(req.query.platforms);
+    if (req.query.nintendo) {
+      console.log(req.query.nintendo);
     }
-    if (req.query.consoles) {
-      console.log(req.query.consoles);
-      const decodedConsoles = Buffer.from(
-        req.query.consoles,
-        "base64"
-      ).toString("utf-8");
-      console.log(decodedConsoles);
+    if (req.query.sega) {
+      console.log(req.query.sega);
+    }
+    if (req.query.playstation) {
+      console.log(req.query.playstation);
+    }
+    if (req.query.xbox) {
+      console.log(req.query.xbox);
     }
 
     const response = await games.getAllGames();
