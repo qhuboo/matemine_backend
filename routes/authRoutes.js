@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
+const findUser = require("../utils.js");
 
 router.post(
   "/register",
@@ -43,7 +44,7 @@ router.post(
     }
 
     const { email, password, firstName, lastName } = req.body;
-
+    findUser(email);
     res.json({ message: "Hello" });
   }
 );
