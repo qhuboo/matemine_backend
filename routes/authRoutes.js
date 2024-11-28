@@ -21,7 +21,7 @@ router.post(
       .withMessage("Password must contain at least one lowercase letter.")
       .matches(/\d/)
       .withMessage("Password must contain at least one number.")
-      .matches(/[@$!%*?&#]/)
+      .matches(/[@$!%*?&#-]/)
       .withMessage("Password must contain at least one special character."),
     body("firstName")
       .trim()
@@ -41,6 +41,7 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log(errors.errors);
       return res.status(400).json({ errors: errors.array() });
     }
 
