@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const { body, validationResult } = require("express-validator");
-const findUser = require("../utils.js");
+const bcrypt = require("bcrypt");
+const { getUser, createUser } = require("../db/users/usersDBFunctions");
 
 router.post(
   "/register",
@@ -37,15 +38,40 @@ router.post(
       .withMessage("Last name contains invalid characters.")
       .escape(),
   ],
-  (req, res) => {
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { email, password, firstName, lastName } = req.body;
-    findUser(email);
-    res.json({ message: "Hello" });
+
+    try {
+      const salt = await bcrypt.genSalt(12);
+      const hash = await bcrypt.hash(password, salt);
+
+      const user = { firstName, lastName, email, hash };
+
+      const result = await getUser(email);
+      if (result.length > 0) {
+        return res.send({ ok: false, message: "The user already exists" });
+      } else {
+        const result = await createUser(user);
+        if (result.length > 0) {
+          res.json({
+            message: "User successfully registered",
+            firstName,
+            lastName,
+            email,
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: "There was an error on the server creating the user",
+      });
+    }
   }
 );
 

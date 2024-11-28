@@ -6,9 +6,9 @@ async function findUser(email) {
       email,
     ]);
     if (result.length > 0) {
-      console.log("User found");
+      return result[0];
     } else {
-      console.log("User does not exist");
+      return undefined;
     }
   } catch (error) {
     throw new Error(`Error: ${error}`);
