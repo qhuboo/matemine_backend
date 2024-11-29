@@ -6,9 +6,9 @@ async function getUser(email) {
       email,
     ]);
     if (result.length > 0) {
-      return result;
+      return result[0];
     } else {
-      return [];
+      return undefined;
     }
   } catch (error) {
     throw new Error(`Error: ${error}`);

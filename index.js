@@ -12,7 +12,12 @@ app.set("trust proxy", true);
 
 app.use(cors());
 
-app.use(express.json());
+app.use(express.json(), (err, req, res, next) => {
+  if (err) {
+    console.error("Malformed JSON:", err.message);
+    return res.status(400).json({ msg: "Invalid JSON payload" });
+  }
+});
 
 app.get("/", async (req, res) => {
   res.send("Hello");

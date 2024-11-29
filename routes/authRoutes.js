@@ -41,8 +41,8 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log(errors.errors);
-      return res.status(400).json({ errors: errors.array() });
+      const allErrors = errors.errors.map((error) => error.msg);
+      return res.status(400).json({ ok: false, errors: allErrors });
     }
 
     const { email, password, firstName, lastName } = req.body;
@@ -51,14 +51,16 @@ router.post(
       const salt = await bcrypt.genSalt(12);
       const hash = await bcrypt.hash(password, salt);
 
-      const user = { firstName, lastName, email, hash };
+      const newUser = { firstName, lastName, email, hash };
 
-      const result = await getUser(email);
-      if (result.length > 0) {
-        return res.send({ ok: false, message: "The user already exists" });
+      const user = await getUser(email);
+      if (user) {
+        return res
+          .status(409)
+          .send({ ok: false, message: "The user already exists" });
       } else {
-        const result = await createUser(user);
-        if (result.length > 0) {
+        const createdUser = await createUser(newUser);
+        if (createdUser) {
           res.json({
             message: "User successfully registered",
             firstName,
@@ -70,6 +72,7 @@ router.post(
     } catch (error) {
       console.log(error);
       res.status(500).json({
+        ok: false,
         message: "There was an error on the server creating the user",
       });
     }
@@ -84,16 +87,38 @@ router.post(
       .isEmail()
       .withMessage("Please enter a valid email address.")
       .normalizeEmail(),
+    body("password").notEmpty().withMessage("Please enter a password"),
   ],
-  (req, res) => {
+  async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      const allErrors = errors.errors.map((error) => error.msg);
+      return res.status(400).json({ ok: false, errors: allErrors });
     }
 
     const { email, password } = req.body;
-
-    res.json({ message: "Hello" });
+    try {
+      const user = await getUser(email);
+      if (user) {
+        const hashedPassword = user.password;
+        const match = await bcrypt.compare(password, hashedPassword);
+        if (match) {
+          res.json({
+            msg: "Login Successful",
+            email: user.email,
+            firstName: user.first_name,
+            lastName: user.last_name,
+          });
+        } else {
+          res.status(401).json({ msg: "Invalid credentials" });
+        }
+      } else {
+        res.status(401).json({ msg: "Invalid credentials" });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ msg: "There was an error on the server" });
+    }
   }
 );
 
