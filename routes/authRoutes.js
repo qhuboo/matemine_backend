@@ -39,15 +39,15 @@ router.post(
       .escape(),
   ],
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const allErrors = errors.errors.map((error) => error.msg);
-      return res.status(400).json({ ok: false, errors: allErrors });
-    }
-
-    const { email, password, firstName, lastName } = req.body;
-
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const allErrors = errors.errors.map((error) => error.msg);
+        return res.status(400).json({ ok: false, errors: allErrors });
+      }
+
+      const { email, password, firstName, lastName } = req.body;
+
       const salt = await bcrypt.genSalt(12);
       const hash = await bcrypt.hash(password, salt);
 
@@ -90,14 +90,15 @@ router.post(
     body("password").notEmpty().withMessage("Please enter a password"),
   ],
   async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const allErrors = errors.errors.map((error) => error.msg);
-      return res.status(400).json({ ok: false, errors: allErrors });
-    }
-
-    const { email, password } = req.body;
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const allErrors = errors.errors.map((error) => error.msg);
+        return res.status(400).json({ ok: false, errors: allErrors });
+      }
+
+      const { email, password } = req.body;
+
       const user = await getUser(email);
       if (user) {
         const hashedPassword = user.password;
