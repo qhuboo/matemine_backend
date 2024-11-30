@@ -38,15 +38,19 @@ async function loginUser(req, res, next) {
   const { email, password } = req.body;
   const user = await getUser(email);
 
-  const hashedPassword = user.password;
-  const match = await bcrypt.compare(password, hashedPassword);
-  if (match) {
-    res.json({
-      msg: "Login Successful",
-      email: user.email,
-      firstName: user.first_name,
-      lastName: user.last_name,
-    });
+  if (user) {
+    const hashedPassword = user.password;
+    const match = await bcrypt.compare(password, hashedPassword);
+    if (match) {
+      res.json({
+        msg: "Login Successful",
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name,
+      });
+    } else {
+      throw new AuthenticationError("Error validating credentials");
+    }
   } else {
     throw new AuthenticationError("Error validating credentials");
   }

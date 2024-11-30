@@ -5,6 +5,7 @@ const {
 } = require("./errorTypes");
 
 function globalErrorHandler(err, req, res, next) {
+  console.log(err);
   // Handle Validation Errors
   if (err instanceof ValidationError) {
     console.log(err.errors);
