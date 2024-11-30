@@ -7,7 +7,7 @@ async function registerUser(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const allErrors = errors.errors.map((error) => error.msg);
-    throw new ValidationError(`Error validating credentials: ${allErrors}`);
+    throw new ValidationError(`Error validating credentials`, allErrors);
   }
 
   const { email, password, firstName, lastName } = req.body;
@@ -32,7 +32,7 @@ async function loginUser(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const allErrors = errors.errors.map((error) => error.msg);
-    throw new ValidationError(`Error validating credentials: ${allErrors}`);
+    throw new ValidationError(`Error validating credentials`, allErrors);
   }
 
   const { email, password } = req.body;

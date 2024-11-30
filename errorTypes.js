@@ -17,9 +17,10 @@ class DatabaseError extends AppError {
 }
 
 class ValidationError extends AppError {
-  constructor(message) {
+  constructor(message, errors) {
     super(message, 400);
     this.name = "Validation Error";
+    this.errors = errors;
   }
 }
 

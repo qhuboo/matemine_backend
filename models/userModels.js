@@ -33,6 +33,11 @@ async function createUser({ firstName, lastName, email, hash }) {
     }
   } catch (err) {
     console.log(err.code);
+    if (err.code === 23505) {
+      throw new DatabaseError(
+        `Database Error while creating user: ${err.message}`
+      );
+    }
     throw new DatabaseError(
       `Database Error while creating user: ${err.message}`
     );

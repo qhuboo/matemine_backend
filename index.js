@@ -6,6 +6,7 @@ const PORT = 8080;
 
 const games = require("./routes/gameRoutes");
 const auth = require("./routes/authRoutes");
+const { globalErrorHandler } = require("./globalErrorHandler");
 
 // Ensure the server trusts the proxy
 app.set("trust proxy", true);
@@ -35,11 +36,7 @@ app.use((req, res) => {
 });
 
 // Global Error handler
-app.use((err, req, res, next) => {
-  console.log(err.statusCode);
-  console.log(err.status);
-  res.status(500).json({ message: err.message });
-});
+app.use(globalErrorHandler);
 
 process.on("uncaughtException", (err) => {
   console.error(`Error: ${err.message}`);
