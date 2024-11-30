@@ -11,7 +11,7 @@ const { globalErrorHandler } = require("./globalErrorHandler");
 // Ensure the server trusts the proxy
 app.set("trust proxy", true);
 
-app.use(cors({ origin: ["http:localhost:5173", "https://matemine.shop"] }));
+app.use(cors({ origin: ["http://localhost:5173", "https://matemine.shop"] }));
 
 app.use(express.json());
 
