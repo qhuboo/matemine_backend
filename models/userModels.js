@@ -7,6 +7,7 @@ async function getUser(email) {
       email,
     ]);
     if (result.length > 0) {
+      console.log(result);
       return result[0];
     } else {
       return undefined;
@@ -25,8 +26,8 @@ async function createUser({ firstName, lastName, email, hash }) {
       "INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4) RETURNING *",
       [firstName, lastName, email, hash]
     );
-
     if (result.length > 0) {
+      console.log(result);
       return result;
     } else {
       return undefined;

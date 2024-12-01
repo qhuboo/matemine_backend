@@ -18,7 +18,7 @@ app.use(express.json());
 // Middleware to catch JSON parsing errors
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && "body" in err) {
-    return res.status(400).json({ msg: "Invalid JSON payload" });
+    return res.status(400).json({ message: "Invalid JSON payload" });
   }
   next(err);
 });

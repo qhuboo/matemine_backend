@@ -20,10 +20,11 @@ async function registerUser(req, res, next) {
 
   if (createdUser) {
     res.json({
-      message: "User successfully registered",
+      isRegistered: true,
       firstName,
       lastName,
       email,
+      admin,
     });
   }
 }
@@ -43,16 +44,17 @@ async function loginUser(req, res, next) {
     const match = await bcrypt.compare(password, hashedPassword);
     if (match) {
       res.json({
-        msg: "Login Successful",
+        isAuthenticated: true,
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
+        admin: user.admin,
       });
     } else {
-      throw new AuthenticationError("Error validating credentials");
+      throw new AuthenticationError("Authentication failed");
     }
   } else {
-    throw new AuthenticationError("Error validating credentials");
+    throw new AuthenticationError("Authentication failed");
   }
 }
 
