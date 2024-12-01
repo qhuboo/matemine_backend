@@ -49,6 +49,8 @@ async function loginUser(req, res, next) {
         firstName: user.first_name,
         lastName: user.last_name,
         admin: user.admin,
+        token:
+          "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTczMzAyODc4OSwiaWF0IjoxNzMzMDI4Nzg5fQ.m-tzQ28-DU7r3OcBrBGaXGzbq0b1peFE7naniDwZACg",
       });
     } else {
       throw new AuthenticationError("Authentication failed");
