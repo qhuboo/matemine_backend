@@ -1,8 +1,9 @@
+const config = require("./config");
 const express = require("express");
 const app = express();
 const cors = require("cors");
 
-const PORT = 8080;
+const PORT = config.port || 3000;
 
 const games = require("./routes/gameRoutes");
 const auth = require("./routes/authRoutes");
