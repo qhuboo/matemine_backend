@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { body } = require("express-validator");
 const { asyncWrapper } = require("../utils");
-const users = require("../controllers/userControllers");
+const users = require("../controllers/authControllers");
 
 // Validation middleware
 const registerValidation = [

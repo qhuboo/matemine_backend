@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const { getUser, createUser } = require("../models/userModels");
+const { getUser, createUser } = require("../models/authModels");
 const { validationResult } = require("express-validator");
 const { ValidationError, AuthenticationError } = require("../errorTypes");
 
