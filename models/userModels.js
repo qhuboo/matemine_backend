@@ -7,7 +7,6 @@ async function getUser(email) {
       email,
     ]);
     if (result.length > 0) {
-      console.log(result);
       return result[0];
     } else {
       return undefined;
@@ -27,8 +26,7 @@ async function createUser({ firstName, lastName, email, hash }) {
       [firstName, lastName, email, hash]
     );
     if (result.length > 0) {
-      console.log(result);
-      return result;
+      return result[0];
     } else {
       return undefined;
     }

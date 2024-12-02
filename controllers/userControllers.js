@@ -17,14 +17,17 @@ async function registerUser(req, res, next) {
 
   const newUser = { firstName, lastName, email, hash };
   const createdUser = await createUser(newUser);
+  console.log(createdUser);
 
   if (createdUser) {
     res.json({
-      isRegistered: true,
-      firstName,
-      lastName,
-      email,
-      admin,
+      isAuthenticated: true,
+      email: createdUser.email,
+      firstName: createdUser.first_name,
+      lastName: createdUser.last_name,
+      admin: createdUser.admin,
+      token:
+        "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTczMzAyODc4OSwiaWF0IjoxNzMzMDI4Nzg5fQ.m-tzQ28-DU7r3OcBrBGaXGzbq0b1peFE7naniDwZACg",
     });
   }
 }
