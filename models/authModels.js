@@ -68,7 +68,7 @@ async function deleteRefreshToken(tokenHash) {
       `DELETE FROM refresh_tokens WHERE token_hash=$1`,
       [tokenHash]
     );
-    if (result.rowCount > 0) {
+    if (result.length > 0) {
       return true;
     } else {
       return false;
@@ -81,4 +81,29 @@ async function deleteRefreshToken(tokenHash) {
   }
 }
 
-module.exports = { getUser, createUser, insertRefreshToken };
+async function getRefreshTokens(userId) {
+  try {
+    const refreshTokens = await db.query(
+      `SELECT * FROM refresh_tokens WHERE user_id = $1 AND expires_at > NOW()`,
+      [userId]
+    );
+    if (refreshTokens.length > 0) {
+      return refreshTokens;
+    } else {
+      return undefined;
+    }
+  } catch (err) {
+    console.log(err);
+    throw new DatabaseError(
+      `Database Error while deleting refresh token: ${err.message}`
+    );
+  }
+}
+
+module.exports = {
+  getUser,
+  createUser,
+  insertRefreshToken,
+  deleteRefreshToken,
+  getRefreshTokens,
+};

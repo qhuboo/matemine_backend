@@ -24,7 +24,6 @@ async function registerUser(req, res, next) {
 
   const newUser = { firstName, lastName, email, hash };
   const createdUser = await createUser(newUser);
-  console.log(createdUser);
 
   if (createdUser) {
     // Generate the tokens
@@ -72,7 +71,7 @@ async function loginUser(req, res, next) {
     if (match) {
       const { accessToken, refreshToken } = generateTokens(user.email);
 
-      const refreshTokenSalt = await bcrypt.salt(12);
+      const refreshTokenSalt = await bcrypt.genSalt(12);
       const refreshTokenHash = await bcrypt.hash(
         refreshToken,
         refreshTokenSalt
@@ -88,7 +87,7 @@ async function loginUser(req, res, next) {
         expiresAt
       );
 
-      if (result.length > 0) {
+      if (result) {
         res.json({
           isAuthenticated: true,
           email: user.email,
