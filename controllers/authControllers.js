@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const { getUser, createUser } = require("../models/authModels");
 const { validationResult } = require("express-validator");
 const { ValidationError, AuthenticationError } = require("../errorTypes");
+const { generateTokens } = require("../utils");
 
 async function registerUser(req, res, next) {
   const errors = validationResult(req);
@@ -20,14 +21,17 @@ async function registerUser(req, res, next) {
   console.log(createdUser);
 
   if (createdUser) {
+    const { accessToken, refreshToken } = generateTokens(createdUser.email);
+    console.log(accessToken);
+    console.log(refreshToken);
     res.json({
       isAuthenticated: true,
       email: createdUser.email,
       firstName: createdUser.first_name,
       lastName: createdUser.last_name,
       admin: createdUser.admin,
-      token:
-        "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTczMzAyODc4OSwiaWF0IjoxNzMzMDI4Nzg5fQ.m-tzQ28-DU7r3OcBrBGaXGzbq0b1peFE7naniDwZACg",
+      accessToken,
+      refreshToken,
     });
   }
 }
@@ -46,14 +50,17 @@ async function loginUser(req, res, next) {
     const hashedPassword = user.password;
     const match = await bcrypt.compare(password, hashedPassword);
     if (match) {
+      const { accessToken, refreshToken } = generateTokens(user.email);
+      console.log(accessToken);
+      console.log(refreshToken);
       res.json({
         isAuthenticated: true,
         email: user.email,
         firstName: user.first_name,
         lastName: user.last_name,
         admin: user.admin,
-        token:
-          "eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTczMzAyODc4OSwiaWF0IjoxNzMzMDI4Nzg5fQ.m-tzQ28-DU7r3OcBrBGaXGzbq0b1peFE7naniDwZACg",
+        accessToken,
+        refreshToken,
       });
     } else {
       throw new AuthenticationError("Authentication failed");
