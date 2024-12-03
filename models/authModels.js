@@ -43,4 +43,42 @@ async function createUser({ firstName, lastName, email, hash }) {
   }
 }
 
-module.exports = { getUser, createUser };
+async function insertRefreshToken(userId, tokenHash, expiresAt) {
+  try {
+    const result = await db.query(
+      `INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, $3) RETURNING *`,
+      [userId, tokenHash, expiresAt]
+    );
+    if (result.length > 0) {
+      return result[0];
+    } else {
+      return undefined;
+    }
+  } catch (err) {
+    console.log(err);
+    throw new DatabaseError(
+      `Database Error while inserting refresh token: ${err.message}`
+    );
+  }
+}
+
+async function deleteRefreshToken(tokenHash) {
+  try {
+    const result = await db.query(
+      `DELETE FROM refresh_tokens WHERE token_hash=$1`,
+      [tokenHash]
+    );
+    if (result.rowCount > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+    throw new DatabaseError(
+      `Database Error while deleting refresh token: ${err.message}`
+    );
+  }
+}
+
+module.exports = { getUser, createUser, insertRefreshToken };
