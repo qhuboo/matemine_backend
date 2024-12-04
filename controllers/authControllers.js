@@ -4,6 +4,7 @@ const {
   createUser,
   insertRefreshToken,
   getRefreshTokens,
+  deleteRefreshToken,
 } = require("../models/authModels");
 const { validationResult } = require("express-validator");
 const { ValidationError, AuthenticationError } = require("../errorTypes");
@@ -107,37 +108,88 @@ async function loginUser(req, res, next) {
   }
 }
 
+async function logoutUser(req, res, next) {
+  // Check if the request body contains a refresh token
+  if (!req.body.refreshToken) {
+    res.status(401).json({ message: "" });
+  }
+  const { refreshToken } = req.body;
+  const decoded = jwt.verify(refreshToken, config.refreshTokenSecret);
+  const storedRefreshTokens = await getRefreshTokens(decoded.userId);
+  if (storedRefreshTokens) {
+    let validStoredToken = "";
+    for (const storedToken of storedRefreshTokens) {
+      if (await bcrypt.compare(refreshToken, storedToken))
+        validStoredToken = storedToken;
+      break;
+    }
+    if (validStoredToken) {
+      const isRefreshTokenDeleted = await deleteRefreshToken();
+      if (isRefreshTokenDeleted) {
+        res.json({ message: "Successfully logged out" });
+      }
+    }
+  } else {
+    res.status(200).json({ message: "Successfully logged out" });
+  }
+}
+
 async function refreshTokens(req, res, next) {
   // Check if the request body contains a refresh token and email
   if (req.body.refreshToken && req.body.email) {
     // Get the refresh token
-    const { refreshToken } = req.body;
-    const { email } = req.body;
+    const { refreshToken, email } = req.body;
     // Verify the refresh token
     const decoded = jwt.verify(refreshToken, config.refreshTokenSecret);
 
+    // Retrieve user from the database and check the token version against the database
     const user = await getUser(email);
     if (user.token_version !== decoded.tokenVersion) {
       res.status(401).json({ message: "Invalid refresh token" });
     }
 
+    // Get all valid refresh tokens from the database for the user
     const refreshTokens = await getRefreshTokens(decoded.user_id);
     if (refreshTokens) {
-      let validToken = false;
+      let validStoredToken = "";
       for (const storedToken of refreshTokens) {
-        if (await bcrypt.compare(refreshToken, refreshToken.token_hash)) {
-          validToken = true;
+        if (await bcrypt.compare(refreshToken, storedToken)) {
+          validStoredToken = storedToken;
           break;
+        } else {
+          validStoredToken = undefined;
         }
       }
       if (!validToken) {
         res.status(401).json({ message: "Invalid refresh token" });
       }
+    } else {
+      res.status(401).json({ message: "Invalid refresh token" });
     }
     // Generate new token pair
     const newTokens = generateTokens(user);
-    res.status(200).json(newTokens);
+    // Delete the old refresh token and insert the new one
+    const isRefreshTokenDeleted = await deleteRefreshToken(validationResult);
+
+    // Hash the new refresh token
+    const newRefreshTokenSalt = await bcrypt.genSalt(12);
+    const newRefreshTokenHash = await bcrypt.hash(
+      newTokens.refreshToken,
+      newRefreshTokenSalt
+    );
+
+    // Get the expiration date to insert into the database and then insert
+    const expiresAt = new Date(decoded.exp * 1000);
+    const isNewRefreshTokenInserted = await insertRefreshToken(
+      user.user_id,
+      newRefreshTokenHash,
+      expiresAt
+    );
+
+    if (isRefreshTokenDeleted && isNewRefreshTokenInserted) {
+      res.status(200).json(newTokens);
+    }
   }
 }
 
-module.exports = { registerUser, loginUser, refreshTokens };
+module.exports = { registerUser, loginUser, logoutUser, refreshTokens };
