@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { body } = require("express-validator");
 const { asyncWrapper } = require("../utils");
-const users = require("../controllers/authControllers");
+const auth = require("../controllers/authControllers");
 
 // Validation middleware
 const registerValidation = [
@@ -45,8 +45,10 @@ const loginValidation = [
   body("password").notEmpty().withMessage("Please enter a password"),
 ];
 
-router.post("/register", registerValidation, asyncWrapper(users.registerUser));
+router.post("/register", registerValidation, asyncWrapper(auth.registerUser));
 
-router.post("/login", loginValidation, asyncWrapper(users.loginUser));
+router.post("/login", loginValidation, asyncWrapper(auth.loginUser));
+
+router.post("/refresh");
 
 module.exports = router;
