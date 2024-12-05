@@ -20,7 +20,7 @@ async function tokenAuthMiddlware(req, res, next) {
     console.log(user);
     if (user) {
       if (decoded.tokenVersion !== user.token_version) {
-        res.status(401).json({ message: "Token version is invalid" });
+        return res.status(401).json({ message: "Token version is invalid" });
       }
     }
     req.user = decoded;

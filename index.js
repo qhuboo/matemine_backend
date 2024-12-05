@@ -7,6 +7,8 @@ const PORT = config.port || 3000;
 
 const games = require("./routes/gameRoutes");
 const auth = require("./routes/authRoutes");
+
+const tokenAuthMiddleware = require("./middleware/tokenAuthMiddleware");
 const { globalErrorHandler } = require("./globalErrorHandler");
 
 // Ensure the server trusts the proxy
@@ -30,6 +32,9 @@ app.get("/", async (req, res) => {
 
 app.use("/games", games);
 app.use("/auth", auth);
+app.get("/protected", [tokenAuthMiddleware], (req, res) => {
+  res.json({ message: "Got into the protected route" });
+});
 
 // 404
 app.use((req, res) => {

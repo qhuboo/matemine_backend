@@ -44,7 +44,7 @@ async function registerUser(req, res, next) {
       expiresAt
     );
     if (result) {
-      res.json({
+      return res.json({
         isAuthenticated: true,
         email: createdUser.email,
         firstName: createdUser.first_name,
@@ -90,7 +90,7 @@ async function loginUser(req, res, next) {
       );
 
       if (result) {
-        res.json({
+        return res.json({
           isAuthenticated: true,
           email: user.email,
           firstName: user.first_name,
@@ -111,7 +111,7 @@ async function loginUser(req, res, next) {
 async function logoutUser(req, res, next) {
   // Check if the request body contains a refresh token
   if (!req.body.refreshToken) {
-    res.status(401).json({ message: "" });
+    return res.status(401).json({ message: "" });
   }
   const { refreshToken } = req.body;
   const decoded = jwt.verify(refreshToken, config.refreshTokenSecret);
@@ -126,11 +126,11 @@ async function logoutUser(req, res, next) {
     if (validStoredToken) {
       const isRefreshTokenDeleted = await deleteRefreshToken();
       if (isRefreshTokenDeleted) {
-        res.json({ message: "Successfully logged out" });
+        return res.json({ message: "Successfully logged out" });
       }
     }
   } else {
-    res.status(200).json({ message: "Successfully logged out" });
+    return res.status(200).json({ message: "Successfully logged out" });
   }
 }
 
@@ -145,7 +145,7 @@ async function refreshTokens(req, res, next) {
     // Retrieve user from the database and check the token version against the database
     const user = await getUser(email);
     if (user.token_version !== decoded.tokenVersion) {
-      res.status(401).json({ message: "Invalid refresh token" });
+      return res.status(401).json({ message: "Invalid refresh token" });
     }
 
     // Get all valid refresh tokens from the database for the user
@@ -161,10 +161,10 @@ async function refreshTokens(req, res, next) {
         }
       }
       if (!validToken) {
-        res.status(401).json({ message: "Invalid refresh token" });
+        return res.status(401).json({ message: "Invalid refresh token" });
       }
     } else {
-      res.status(401).json({ message: "Invalid refresh token" });
+      return res.status(401).json({ message: "Invalid refresh token" });
     }
     // Generate new token pair
     const newTokens = generateTokens(user);
@@ -187,7 +187,7 @@ async function refreshTokens(req, res, next) {
     );
 
     if (isRefreshTokenDeleted && isNewRefreshTokenInserted) {
-      res.status(200).json(newTokens);
+      return res.status(200).json(newTokens);
     }
   }
 }
