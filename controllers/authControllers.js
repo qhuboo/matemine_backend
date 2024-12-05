@@ -29,7 +29,7 @@ async function registerUser(req, res, next) {
 
   if (createdUser) {
     // Generate the tokens
-    const { accessToken, refreshToken } = generateTokens(createdUser.email);
+    const { accessToken, refreshToken } = generateTokens(createdUser);
     // Hash the refresh token and insert into the database
     const refreshTokenSalt = await bcrypt.genSalt(12);
     const refreshTokenHash = await bcrypt.hash(refreshToken, refreshTokenSalt);
@@ -140,27 +140,31 @@ async function refreshTokens(req, res, next) {
     // Get the refresh token
     const { refreshToken, email } = req.body;
     // Verify the refresh token
+
     const decoded = jwt.verify(refreshToken, config.refreshTokenSecret);
 
     // Retrieve user from the database and check the token version against the database
     const user = await getUser(email);
+    console.log(user);
     if (user.token_version !== decoded.tokenVersion) {
+      console.log(user.token_version);
+      console.log(decoded);
+      console.log("here");
       return res.status(401).json({ message: "Invalid refresh token" });
     }
 
     // Get all valid refresh tokens from the database for the user
     const refreshTokens = await getRefreshTokens(decoded.user_id);
+    console.log(refreshTokens);
     if (refreshTokens) {
-      let validStoredToken = "";
+      let validStoredToken = undefined;
       for (const storedToken of refreshTokens) {
         if (await bcrypt.compare(refreshToken, storedToken)) {
           validStoredToken = storedToken;
           break;
-        } else {
-          validStoredToken = undefined;
         }
       }
-      if (!validToken) {
+      if (!validStoredToken) {
         return res.status(401).json({ message: "Invalid refresh token" });
       }
     } else {
@@ -169,7 +173,7 @@ async function refreshTokens(req, res, next) {
     // Generate new token pair
     const newTokens = generateTokens(user);
     // Delete the old refresh token and insert the new one
-    const isRefreshTokenDeleted = await deleteRefreshToken(validationResult);
+    const isRefreshTokenDeleted = await deleteRefreshToken(validStoredToken);
 
     // Hash the new refresh token
     const newRefreshTokenSalt = await bcrypt.genSalt(12);
@@ -189,7 +193,12 @@ async function refreshTokens(req, res, next) {
     if (isRefreshTokenDeleted && isNewRefreshTokenInserted) {
       return res.status(200).json(newTokens);
     }
+  } else {
+    return res
+      .status(401)
+      .json({ message: "Please provide an email and refresh token" });
   }
+  return res.json({ message: "ha" });
 }
 
 module.exports = { registerUser, loginUser, logoutUser, refreshTokens };
