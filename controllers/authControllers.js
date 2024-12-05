@@ -144,27 +144,28 @@ async function refreshTokens(req, res, next) {
     const decoded = jwt.verify(refreshToken, config.refreshTokenSecret);
 
     // Retrieve user from the database and check the token version against the database
+
     const user = await getUser(email);
-    console.log(user);
+
     if (user.token_version !== decoded.tokenVersion) {
-      console.log(user.token_version);
-      console.log(decoded);
-      console.log("here");
       return res.status(401).json({ message: "Invalid refresh token" });
     }
+    console.log(
+      "******************** REFRESH ROUTE **********************************************************************"
+    );
 
     // Get all valid refresh tokens from the database for the user
-    const refreshTokens = await getRefreshTokens(decoded.user_id);
-    console.log(refreshTokens);
+    const refreshTokens = await getRefreshTokens(decoded.userId);
+
+    let validStoredToken = "";
     if (refreshTokens) {
-      let validStoredToken = undefined;
       for (const storedToken of refreshTokens) {
-        if (await bcrypt.compare(refreshToken, storedToken)) {
-          validStoredToken = storedToken;
+        if (await bcrypt.compare(refreshToken, storedToken.token_hash)) {
+          validStoredToken = storedToken.token_hash;
           break;
         }
       }
-      if (!validStoredToken) {
+      if (!(validStoredToken.length > 0)) {
         return res.status(401).json({ message: "Invalid refresh token" });
       }
     } else {
@@ -173,6 +174,7 @@ async function refreshTokens(req, res, next) {
     // Generate new token pair
     const newTokens = generateTokens(user);
     // Delete the old refresh token and insert the new one
+
     const isRefreshTokenDeleted = await deleteRefreshToken(validStoredToken);
 
     // Hash the new refresh token
@@ -190,9 +192,15 @@ async function refreshTokens(req, res, next) {
       expiresAt
     );
 
+    console.log(isRefreshTokenDeleted);
+    console.log(isNewRefreshTokenInserted);
     if (isRefreshTokenDeleted && isNewRefreshTokenInserted) {
       return res.status(200).json(newTokens);
     }
+
+    console.log(
+      "******************** REFRESH ROUTE **********************************************************************"
+    );
   } else {
     return res
       .status(401)

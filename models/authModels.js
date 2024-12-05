@@ -65,9 +65,10 @@ async function insertRefreshToken(userId, tokenHash, expiresAt) {
 async function deleteRefreshToken(tokenHash) {
   try {
     const result = await db.query(
-      `DELETE FROM refresh_tokens WHERE token_hash=$1`,
+      `DELETE FROM refresh_tokens WHERE token_hash=$1 RETURNING *`,
       [tokenHash]
     );
+
     if (result.length > 0) {
       return true;
     } else {
@@ -87,6 +88,7 @@ async function getRefreshTokens(userId) {
       `SELECT * FROM refresh_tokens WHERE user_id = $1 AND expires_at > NOW()`,
       [userId]
     );
+
     if (refreshTokens.length > 0) {
       return refreshTokens;
     } else {

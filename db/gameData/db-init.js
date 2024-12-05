@@ -16,7 +16,7 @@ const createTablesQueries = [
   `CREATE TABLE IF NOT EXISTS refresh_tokens(
       token_id SERIAL PRIMARY KEY,
       user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
-      token_hash VARCHAR(255) NOT NULL,
+      token_hash CHAR(60) NOT NULL,
       expires_at TIMESTAMP NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`,

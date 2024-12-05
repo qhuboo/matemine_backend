@@ -15,7 +15,7 @@ async function tokenAuthMiddlware(req, res, next) {
     const decoded = jwt.verify(accessToken, config.accessTokenSecret);
 
     // Check token version against database
-    const user = getUser(decoded.email);
+    const user = await getUser(decoded.email);
 
     console.log(user);
     if (user) {
