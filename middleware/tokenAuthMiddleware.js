@@ -17,7 +17,6 @@ async function tokenAuthMiddlware(req, res, next) {
     // Check token version against database
     const user = await getUser(decoded.email);
 
-    console.log(user);
     if (user) {
       if (decoded.tokenVersion !== user.token_version) {
         return res.status(401).json({ message: "Token version is invalid" });

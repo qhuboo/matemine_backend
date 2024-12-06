@@ -150,9 +150,6 @@ async function refreshTokens(req, res, next) {
     if (user.token_version !== decoded.tokenVersion) {
       return res.status(401).json({ message: "Invalid refresh token" });
     }
-    console.log(
-      "******************** REFRESH ROUTE **********************************************************************"
-    );
 
     // Get all valid refresh tokens from the database for the user
     const refreshTokens = await getRefreshTokens(decoded.userId);
@@ -192,15 +189,9 @@ async function refreshTokens(req, res, next) {
       expiresAt
     );
 
-    console.log(isRefreshTokenDeleted);
-    console.log(isNewRefreshTokenInserted);
     if (isRefreshTokenDeleted && isNewRefreshTokenInserted) {
       return res.status(200).json(newTokens);
     }
-
-    console.log(
-      "******************** REFRESH ROUTE **********************************************************************"
-    );
   } else {
     return res
       .status(401)
