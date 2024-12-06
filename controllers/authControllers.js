@@ -109,28 +109,41 @@ async function loginUser(req, res, next) {
 }
 
 async function logoutUser(req, res, next) {
-  // Check if the request body contains a refresh token
-  if (!req.body.refreshToken) {
-    return res.status(401).json({ message: "" });
-  }
-  const { refreshToken } = req.body;
-  const decoded = jwt.verify(refreshToken, config.refreshTokenSecret);
-  const storedRefreshTokens = await getRefreshTokens(decoded.userId);
-  if (storedRefreshTokens) {
-    let validStoredToken = "";
-    for (const storedToken of storedRefreshTokens) {
-      if (await bcrypt.compare(refreshToken, storedToken))
-        validStoredToken = storedToken;
-      break;
+  try {
+    // Check if the request body contains a refresh token
+    if (!req.body.refreshToken) {
+      return res
+        .status(401)
+        .json({ message: "Please provide a refresh token" });
     }
-    if (validStoredToken) {
-      const isRefreshTokenDeleted = await deleteRefreshToken();
-      if (isRefreshTokenDeleted) {
-        return res.json({ message: "Successfully logged out" });
+    const { refreshToken } = req.body;
+    const decoded = jwt.verify(refreshToken, config.refreshTokenSecret);
+    const storedRefreshTokens = await getRefreshTokens(decoded.userId);
+    let validStoredToken = "";
+    if (storedRefreshTokens) {
+      for (const storedToken of storedRefreshTokens) {
+        if (await bcrypt.compare(refreshToken, storedToken.token_hash))
+          validStoredToken = storedToken.token_hash;
+        break;
+      }
+      if (validStoredToken.length > 0) {
+        const isRefreshTokenDeleted = await deleteRefreshToken(
+          validStoredToken
+        );
+        if (isRefreshTokenDeleted) {
+          return res.json({ message: "Successfully logged out" });
+        }
+      }
+    } else {
+      return res.status(200).json({ message: "Successfully logged out" });
+    }
+  } catch (err) {
+    console.log(err);
+    if (err.name === "TokenExpiredError") {
+      if (err.message === "jwt expired") {
+        return res.status(401).json({ message: "Refresh token is expired" });
       }
     }
-  } else {
-    return res.status(200).json({ message: "Successfully logged out" });
   }
 }
 
@@ -197,7 +210,6 @@ async function refreshTokens(req, res, next) {
       .status(401)
       .json({ message: "Please provide an email and refresh token" });
   }
-  return res.json({ message: "ha" });
 }
 
 module.exports = { registerUser, loginUser, logoutUser, refreshTokens };

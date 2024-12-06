@@ -49,6 +49,8 @@ router.post("/register", registerValidation, asyncWrapper(auth.registerUser));
 
 router.post("/login", loginValidation, asyncWrapper(auth.loginUser));
 
+router.post("/logout", asyncWrapper(auth.logoutUser));
+
 router.post("/refresh", asyncWrapper(auth.refreshTokens));
 
 module.exports = router;

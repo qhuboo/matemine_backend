@@ -6,6 +6,13 @@ const {
 
 function globalErrorHandler(err, req, res, next) {
   console.log(err);
+
+  if (err.name === "TokenExpiredError") {
+    if (err.message === "jwt expired") {
+      return res.status(401).json({ message: "Refresh token is expired" });
+    }
+  }
+
   // Handle Validation Errors
   if (err instanceof ValidationError) {
     console.log(err.errors);
