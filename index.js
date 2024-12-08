@@ -32,7 +32,7 @@ app.get("/", async (req, res) => {
 
 app.use("/games", games);
 app.use("/auth", auth);
-app.post("/protected", [tokenAuthMiddleware], (req, res) => {
+app.post("/protected", tokenAuthMiddleware, (req, res) => {
   res.json({ message: "Got into the protected route" });
 });
 
