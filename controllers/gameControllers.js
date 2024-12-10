@@ -9,7 +9,41 @@ const {
 } = require("../models/gameModels");
 
 async function getAllGamesController(req, res) {
-  const result = await getAllGames();
+  // Consoles
+  const nintendo = req.query?.nintendo
+    ? req.query?.nintendo.split(",")
+    : undefined;
+
+  const sega = req.query?.sega ? req.query?.sega.split(",") : undefined;
+
+  const playstation = req.query?.playstation
+    ? req.query?.playstation.split(",")
+    : undefined;
+
+  const xbox = req.query?.xbox ? req.query?.xbox.split(",") : undefined;
+
+  let consoles = [];
+  if (nintendo) {
+    consoles = [...nintendo, ...consoles];
+  }
+  if (sega) {
+    consoles = [...sega, ...consoles];
+  }
+  if (playstation) {
+    consoles = [...playstation, ...consoles];
+  }
+  if (xbox) {
+    consoles = [...xbox, ...consoles];
+  }
+
+  const options = {
+    perPage: req.query?.perPage ? req.query?.perPage : undefined,
+    page: req.query?.page ? req.query?.page : undefined,
+    sort: req.query?.sort ? req.query?.sort : undefined,
+    consoles,
+  };
+
+  const result = await getAllGames(options);
   res.json(result);
 }
 

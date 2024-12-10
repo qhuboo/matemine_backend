@@ -1,9 +1,54 @@
 const db = require("../db/db-pool");
 const { DatabaseError } = require("../errorTypes");
 
-async function getAllGames() {
+async function getAllGames(options) {
   try {
-    const games = await db.query("SELECT * FROM games LIMIT 30");
+    // Setting the sort option
+    const validSortMappings = {
+      "alpha-desc": { sortBy: "g.title", direction: "DESC" },
+      "alpha-asc": { sortBy: "g.title", direction: "ASC" },
+      "rating-desc": { sortBy: "g.rating", direction: "DESC" },
+      "rating-asc": { sortBy: "g.rating", direction: "ASC" },
+      "price-desc": { sortBy: "g.price", direction: "DESC" },
+      "price-asc": { sortBy: "g.price", direction: "ASC" },
+    };
+    let columnSort = "g.title";
+    let direction = "DESC";
+
+    if (
+      options.sort &&
+      Object.keys(validSortMappings).includes(options?.sort)
+    ) {
+      columnSort = validSortMappings[options.sort].sortBy;
+      direction = validSortMappings[options.sort].direction;
+    }
+
+    // Setting the perPage option
+    let perPage = 12;
+    const validPerPageOptions = ["12", "24", "48", "76"];
+    if (validPerPageOptions.includes(options.perPage)) {
+      perPage = options.perPage;
+    }
+
+    // Setting the page option
+    let page = "1";
+    const regex = new RegExp("^[0-9]+$");
+    if (regex.test(options.page)) {
+      page = parseInt(options.page);
+    }
+
+    const queryText = `SELECT DISTINCT g.*
+    FROM games g
+    JOIN game_platforms gp ON g.game_id = gp.game_id
+    JOIN platforms p ON gp.platform_id = p.platform_id
+    WHERE (
+    CARDINALITY($1::text[]) = 0   
+    OR p.platform_name = ANY($1::text[]) 
+)ORDER BY ${columnSort} ${direction} LIMIT ${perPage} OFFSET ${
+      (page - 1) * perPage
+    }`;
+
+    const games = await db.query(queryText, [options.consoles]);
 
     return games;
   } catch (err) {

@@ -4,12 +4,13 @@ const game_data = require("./game_data");
 async function insertGame(game) {
   try {
     await client.query(
-      "INSERT INTO games(game_id, title, description, price, sample_cover_image, sample_cover_thumbnail) VALUES($1, $2, $3, $4, $5, $6)",
+      "INSERT INTO games(game_id, title, description, price,rating, sample_cover_image, sample_cover_thumbnail) VALUES($1, $2, $3, $4, $5, $6, $7)",
       [
         game.game_id,
         game.title,
         game.description,
         game.price,
+        game.moby_score,
         game.sample_cover.image,
         game.sample_cover.thumbnail_image,
       ]
