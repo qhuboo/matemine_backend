@@ -48,6 +48,14 @@ async function registerUser(req, res, next) {
       const remainingSeconds = decoded.exp - nowInSeconds;
       const maxAge = remainingSeconds * 1000;
       return res
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: true,
+          maxAge,
+          path: "/refresh",
+          sameSite: "strict",
+          signed: true,
+        })
         .json({
           isAuthenticated: true,
           email: createdUser.email,
@@ -56,14 +64,6 @@ async function registerUser(req, res, next) {
           admin: createdUser.admin,
           accessToken,
           refreshToken,
-        })
-        .cookie("refreshToken", refreshToken, {
-          httpOnly: true,
-          secure: true,
-          maxAge,
-          path: "/refresh",
-          sameSite: "strict",
-          signed: true,
         });
     }
   }
@@ -107,14 +107,6 @@ async function loginUser(req, res, next) {
         const maxAge = remainingSeconds * 1000;
 
         return res
-          .json({
-            isAuthenticated: true,
-            email: user.email,
-            firstName: user.first_name,
-            lastName: user.last_name,
-            admin: user.admin,
-            accessToken,
-          })
           .cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: true,
@@ -122,6 +114,14 @@ async function loginUser(req, res, next) {
             path: "/refresh",
             sameSite: "strict",
             signed: true,
+          })
+          .json({
+            isAuthenticated: true,
+            email: user.email,
+            firstName: user.first_name,
+            lastName: user.last_name,
+            admin: user.admin,
+            accessToken,
           });
       }
     } else {
@@ -233,7 +233,6 @@ async function refreshTokens(req, res, next) {
       const maxAge = remainingSeconds * 1000;
       return res
         .status(200)
-        .json({ accessToken: newTokens.accessToken })
         .cookie("refreshToken", refreshToken, {
           httpOnly: true,
           secure: true,
@@ -241,7 +240,8 @@ async function refreshTokens(req, res, next) {
           path: "/refresh",
           sameSite: "strict",
           signed: true,
-        });
+        })
+        .json({ accessToken: newTokens.accessToken });
     }
   } else {
     return res
