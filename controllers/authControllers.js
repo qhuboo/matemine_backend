@@ -44,15 +44,27 @@ async function registerUser(req, res, next) {
       expiresAt
     );
     if (result) {
-      return res.json({
-        isAuthenticated: true,
-        email: createdUser.email,
-        firstName: createdUser.first_name,
-        lastName: createdUser.last_name,
-        admin: createdUser.admin,
-        accessToken,
-        refreshToken,
-      });
+      const nowInSeconds = Math.floor(Date.now() / 1000);
+      const remainingSeconds = decoded.exp - nowInSeconds;
+      const maxAge = remainingSeconds * 1000;
+      return res
+        .json({
+          isAuthenticated: true,
+          email: createdUser.email,
+          firstName: createdUser.first_name,
+          lastName: createdUser.last_name,
+          admin: createdUser.admin,
+          accessToken,
+          refreshToken,
+        })
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: true,
+          maxAge,
+          path: "/refresh",
+          sameSite: "strict",
+          signed: true,
+        });
     }
   }
 }
@@ -90,15 +102,27 @@ async function loginUser(req, res, next) {
       );
 
       if (result) {
-        return res.json({
-          isAuthenticated: true,
-          email: user.email,
-          firstName: user.first_name,
-          lastName: user.last_name,
-          admin: user.admin,
-          accessToken,
-          refreshToken,
-        });
+        const nowInSeconds = Math.floor(Date.now() / 1000);
+        const remainingSeconds = decoded.exp - nowInSeconds;
+        const maxAge = remainingSeconds * 1000;
+
+        return res
+          .json({
+            isAuthenticated: true,
+            email: user.email,
+            firstName: user.first_name,
+            lastName: user.last_name,
+            admin: user.admin,
+            accessToken,
+          })
+          .cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: true,
+            maxAge,
+            path: "/refresh",
+            sameSite: "strict",
+            signed: true,
+          });
       }
     } else {
       throw new AuthenticationError("Authentication failed");
@@ -203,7 +227,21 @@ async function refreshTokens(req, res, next) {
     );
 
     if (isRefreshTokenDeleted && isNewRefreshTokenInserted) {
-      return res.status(200).json(newTokens);
+      const decodedRefreshToken = jwt.decode(newTokens.refreshToken);
+      const nowInSeconds = Math.floor(Date.now() / 1000);
+      const remainingSeconds = decodedRefreshToken.exp - nowInSeconds;
+      const maxAge = remainingSeconds * 1000;
+      return res
+        .status(200)
+        .json({ accessToken: newTokens.accessToken })
+        .cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: true,
+          maxAge,
+          path: "/refresh",
+          sameSite: "strict",
+          signed: true,
+        });
     }
   } else {
     return res

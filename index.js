@@ -2,6 +2,7 @@ const config = require("./config");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const PORT = config.port || 3000;
 
@@ -17,6 +18,8 @@ app.set("trust proxy", true);
 app.use(cors({ origin: ["http://localhost:5173", "https://matemine.shop"] }));
 
 app.use(express.json());
+
+app.use(cookieParser(config.cookieSecret));
 
 // Middleware to catch JSON parsing errors
 app.use((err, req, res, next) => {
