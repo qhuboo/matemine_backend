@@ -73,6 +73,9 @@ async function getPlatformIdController(req, res) {
 }
 
 async function getGameScreenshotsController(req, res) {
+  console.log("Here");
+  console.log(req.signedCookies.refreshToken);
+  console.log(req.cookies);
   const result = await getGameScreenshots(req.params.game_id);
   res.json(result);
 }

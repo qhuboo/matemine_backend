@@ -9,6 +9,7 @@ const config = {
   accessTokenExpiry: process.env.ACCESS_TOKEN_EXPIRY,
   refreshTokenExpiry: process.env.REFRESH_TOKEN_EXPIRY,
   cookieSecret: process.env.COOKIE_SECRET,
+  nodeEnv: process.env.NODE_ENV,
 };
 
 module.exports = config;

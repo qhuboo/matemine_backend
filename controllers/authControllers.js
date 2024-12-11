@@ -12,6 +12,15 @@ const { generateTokens } = require("../utils");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: false,
+  sameSite: "lax",
+  maxAge: 24 * 60 * 60 * 1000,
+  path: "/",
+  domain: "undefined",
+};
+
 async function registerUser(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -47,24 +56,14 @@ async function registerUser(req, res, next) {
       const nowInSeconds = Math.floor(Date.now() / 1000);
       const remainingSeconds = decoded.exp - nowInSeconds;
       const maxAge = remainingSeconds * 1000;
-      return res
-        .cookie("refreshToken", refreshToken, {
-          httpOnly: true,
-          secure: true,
-          maxAge,
-          path: "/refresh",
-          sameSite: "strict",
-          signed: true,
-        })
-        .json({
-          isAuthenticated: true,
-          email: createdUser.email,
-          firstName: createdUser.first_name,
-          lastName: createdUser.last_name,
-          admin: createdUser.admin,
-          accessToken,
-          refreshToken,
-        });
+      return res.cookie("refreshToken", refreshToken, cookieOptions).json({
+        isAuthenticated: true,
+        email: createdUser.email,
+        firstName: createdUser.first_name,
+        lastName: createdUser.last_name,
+        admin: createdUser.admin,
+        accessToken,
+      });
     }
   }
 }
@@ -106,23 +105,14 @@ async function loginUser(req, res, next) {
         const remainingSeconds = decoded.exp - nowInSeconds;
         const maxAge = remainingSeconds * 1000;
 
-        return res
-          .cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: true,
-            maxAge,
-            path: "/refresh",
-            sameSite: "strict",
-            signed: true,
-          })
-          .json({
-            isAuthenticated: true,
-            email: user.email,
-            firstName: user.first_name,
-            lastName: user.last_name,
-            admin: user.admin,
-            accessToken,
-          });
+        return res.cookie("refreshToken", refreshToken, cookieOptions).json({
+          isAuthenticated: true,
+          email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          admin: user.admin,
+          accessToken,
+        });
       }
     } else {
       throw new AuthenticationError("Authentication failed");
@@ -233,14 +223,7 @@ async function refreshTokens(req, res, next) {
       const maxAge = remainingSeconds * 1000;
       return res
         .status(200)
-        .cookie("refreshToken", refreshToken, {
-          httpOnly: true,
-          secure: true,
-          maxAge,
-          path: "/refresh",
-          sameSite: "strict",
-          signed: true,
-        })
+        .cookie("refreshToken", newTokens.refreshToken, cookieOptions)
         .json({ accessToken: newTokens.accessToken });
     }
   } else {
