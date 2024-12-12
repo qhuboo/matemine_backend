@@ -40,7 +40,6 @@ app.use(
       "Access-Control-Request-Method",
       "Access-Control-Request-Headers",
     ],
-    exposedHeaders: ["set-cookie"],
   })
 );
 
