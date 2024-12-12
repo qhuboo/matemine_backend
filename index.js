@@ -29,7 +29,17 @@ app.use(
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Accept",
+      "Accept-Language",
+      "Accept-Encoding",
+      "Origin",
+      "Cache-Control",
+      "Access-Control-Request-Method",
+      "Access-Control-Request-Headers",
+    ],
   })
 );
 
