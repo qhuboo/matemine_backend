@@ -21,7 +21,13 @@ app.set("trust proxy", true);
 
 app.use(
   cors({
-    origin: ["https://localhost:5173", "https://matemine.shop/"],
+    origin: [
+      "https://localhost:5173",
+      "https://matemine.shop/",
+      "https://matemine.shop",
+      "https://www.matemine.shop/",
+      "https://www.matemine.shop",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
