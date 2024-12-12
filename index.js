@@ -23,10 +23,9 @@ app.use(
   cors({
     origin: [
       "https://localhost:5173",
-      "https://matemine.shop/",
       "https://matemine.shop",
-      "https://www.matemine.shop/",
       "https://www.matemine.shop",
+      "https://api.matemine.shop",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
