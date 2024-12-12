@@ -14,11 +14,11 @@ const config = require("../config");
 
 const cookieOptions = {
   httpOnly: true,
-  secure: false,
-  sameSite: "lax",
+  secure: true,
+  sameSite: "strict",
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
-  domain: "undefined",
+  domain: "localhost",
 };
 
 async function registerUser(req, res, next) {
