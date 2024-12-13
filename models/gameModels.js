@@ -37,7 +37,7 @@ async function getAllGames(options) {
       page = parseInt(options.page);
     }
 
-    const queryText = `SELECT DISTINCT g.*
+    const gamesQuery = `SELECT DISTINCT g.*
     FROM games g
     JOIN game_platforms gp ON g.game_id = gp.game_id
     JOIN platforms p ON gp.platform_id = p.platform_id
@@ -48,9 +48,25 @@ async function getAllGames(options) {
       (page - 1) * perPage
     }`;
 
-    const games = await db.query(queryText, [options.consoles]);
+    const countQuery = `
+      SELECT COUNT(DISTINCT g.game_id) AS total_count
+      FROM games g
+      JOIN game_platforms gp ON g.game_id = gp.game_id
+      JOIN platforms p ON gp.platform_id = p.platform_id
+      WHERE (
+        CARDINALITY($1::text[]) = 0   
+        OR p.platform_name = ANY($1::text[])
+      );
+    `;
 
-    return games;
+    const [gamesResult, countResult] = await Promise.all([
+      db.query(gamesQuery, [options.consoles]),
+      db.query(countQuery, [options.consoles]),
+    ]);
+
+    const totalPages = Math.ceil(countResult[0].total_count / perPage);
+    const finalResult = { games: gamesResult, totalPages };
+    return finalResult;
   } catch (err) {
     console.log(err.code);
     throw new DatabaseError(
