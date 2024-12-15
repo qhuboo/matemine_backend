@@ -12,6 +12,7 @@ const PORT = config.port || 3000;
 
 const games = require("./routes/gameRoutes");
 const auth = require("./routes/authRoutes");
+const cart = require("./routes/cartRoutes");
 
 const tokenAuthMiddleware = require("./middleware/tokenAuthMiddleware");
 const { globalErrorHandler } = require("./globalErrorHandler");
@@ -61,8 +62,10 @@ app.get("/", async (req, res) => {
 
 app.use("/games", games);
 app.use("/auth", auth);
+app.use("/cart", tokenAuthMiddleware, cart);
 app.post("/protected", tokenAuthMiddleware, (req, res) => {
-  res.json({ message: "Got into the protected route" });
+  console.log("Got into the protected route");
+  return res.json({ message: "Got into the protected route" });
 });
 
 // 404

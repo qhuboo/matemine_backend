@@ -15,6 +15,7 @@ const config = require("../config");
 const cookieOptions = {
   httpOnly: true,
   secure: true,
+  signed: true,
   sameSite: "strict",
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
@@ -82,7 +83,7 @@ async function loginUser(req, res, next) {
     const hashedPassword = user.password;
     const match = await bcrypt.compare(password, hashedPassword);
     if (match) {
-      const { accessToken, refreshToken } = generateTokens(user.email);
+      const { accessToken, refreshToken } = generateTokens(user);
 
       const refreshTokenSalt = await bcrypt.genSalt(12);
       const refreshTokenHash = await bcrypt.hash(
@@ -101,10 +102,6 @@ async function loginUser(req, res, next) {
       );
 
       if (result) {
-        const nowInSeconds = Math.floor(Date.now() / 1000);
-        const remainingSeconds = decoded.exp - nowInSeconds;
-        const maxAge = remainingSeconds * 1000;
-
         return res.cookie("refreshToken", refreshToken, cookieOptions).json({
           isAuthenticated: true,
           email: user.email,
@@ -162,10 +159,13 @@ async function logoutUser(req, res, next) {
 }
 
 async function refreshTokens(req, res, next) {
+  console.log("refresh got hit");
   // Check if the request body contains a refresh token and email
-  if (req.body.refreshToken && req.body.email) {
-    // Get the refresh token
-    const { refreshToken, email } = req.body;
+  if (req.signedCookies.refreshToken && req.body.email) {
+    console.log("We got both email and refresh token");
+    // Get the refresh token and email
+    const refreshToken = req.signedCookies.refreshToken;
+    const { email } = req.body;
     // Verify the refresh token
 
     const decoded = jwt.verify(refreshToken, config.refreshTokenSecret);
@@ -217,10 +217,7 @@ async function refreshTokens(req, res, next) {
     );
 
     if (isRefreshTokenDeleted && isNewRefreshTokenInserted) {
-      const decodedRefreshToken = jwt.decode(newTokens.refreshToken);
-      const nowInSeconds = Math.floor(Date.now() / 1000);
-      const remainingSeconds = decodedRefreshToken.exp - nowInSeconds;
-      const maxAge = remainingSeconds * 1000;
+      console.log("Refresh successful");
       return res
         .status(200)
         .cookie("refreshToken", newTokens.refreshToken, cookieOptions)
