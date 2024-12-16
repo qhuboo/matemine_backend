@@ -13,7 +13,9 @@ async function addCart(userId) {
   ) RETURNING *`,
       [userId]
     );
-    console.log(result);
+    if (result.length === 1) {
+      return result[0];
+    }
   } catch (error) {
     console.log(error);
   }
@@ -25,8 +27,10 @@ async function getCartId(userId) {
       "SELECT cart_id FROM shopping_carts WHERE user_id = $1",
       [userId]
     );
-    console.log(result);
-    return result;
+    if (result.length === 1) {
+      return result[0].cart_id;
+    }
+    return undefined;
   } catch (error) {
     console.log(error);
   }
@@ -35,12 +39,16 @@ async function getCartId(userId) {
 async function insertGame(cartId, gameId) {
   try {
     const result = await db.query(
-      "INSERT INTO cart_items (cart_id, game_id) VALUES($1, $2)",
+      "INSERT INTO cart_items (cart_id, game_id) VALUES($1, $2) RETURNING *",
       [cartId, gameId]
     );
+    if (result.length === 1) {
+      return true;
+    }
+    return false;
   } catch (error) {
     console.log(error);
   }
 }
 
-module.exports = { addCart, insertGame };
+module.exports = { addCart, getCartId, insertGame };

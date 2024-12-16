@@ -54,9 +54,6 @@ async function registerUser(req, res, next) {
       expiresAt
     );
     if (result) {
-      const nowInSeconds = Math.floor(Date.now() / 1000);
-      const remainingSeconds = decoded.exp - nowInSeconds;
-      const maxAge = remainingSeconds * 1000;
       return res.cookie("refreshToken", refreshToken, cookieOptions).json({
         isAuthenticated: true,
         email: createdUser.email,
@@ -159,10 +156,9 @@ async function logoutUser(req, res, next) {
 }
 
 async function refreshTokens(req, res, next) {
-  console.log("refresh got hit");
   // Check if the request body contains a refresh token and email
+
   if (req.signedCookies.refreshToken && req.body.email) {
-    console.log("We got both email and refresh token");
     // Get the refresh token and email
     const refreshToken = req.signedCookies.refreshToken;
     const { email } = req.body;
@@ -217,7 +213,6 @@ async function refreshTokens(req, res, next) {
     );
 
     if (isRefreshTokenDeleted && isNewRefreshTokenInserted) {
-      console.log("Refresh successful");
       return res
         .status(200)
         .cookie("refreshToken", newTokens.refreshToken, cookieOptions)

@@ -1,12 +1,18 @@
-const { insertGame } = require("../models/cartModels");
+const { insertGame, getCartId } = require("../models/cartModels");
 
 async function addToCart(req, res, next) {
-  console.log(req.body);
-  const { gameId } = req.body.game;
-  const { email } = req.body;
-  console.log(gameId);
-  console.log(email);
-  return res.json({ message: "You hit the add to cart route" });
+  if (!req.body.gameId) {
+    return res.status(400).json({ message: "Invalid game id" });
+  }
+  const { gameId } = req.body;
+  const { userId } = req.user;
+  const cartId = await getCartId(userId);
+  if (cartId) {
+    const insert = await insertGame(cartId, gameId);
+    if (insert) {
+      return res.json({ message: "The game was entered" });
+    }
+  }
 }
 
 module.exports = { addToCart };
