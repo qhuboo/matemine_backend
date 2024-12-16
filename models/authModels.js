@@ -1,5 +1,6 @@
 const db = require("../db/db-pool");
 const { DatabaseError } = require("../errorTypes");
+const cart = require("../models/cartModels");
 
 async function getUser(email) {
   try {
@@ -25,6 +26,12 @@ async function createUser({ firstName, lastName, email, hash }) {
       "INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4) RETURNING *",
       [firstName, lastName, email, hash]
     );
+
+    const user = await getUser(email);
+
+    console.log(user);
+
+    const createdUserCart = cart.addCart(user.user_id);
     if (result.length > 0) {
       return result[0];
     } else {
