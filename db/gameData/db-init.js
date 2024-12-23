@@ -59,7 +59,8 @@ const createTablesQueries = [
   `CREATE TABLE IF NOT EXISTS order_items (
         order_item_id SERIAL PRIMARY KEY,
         order_id INTEGER REFERENCES orders(order_id),
-        game_id INTEGER REFERENCES games(game_id)
+        game_id INTEGER REFERENCES games(game_id),
+        quantity INTEGER
     )`,
   `CREATE TABLE IF NOT EXISTS shopping_carts (
         cart_id SERIAL PRIMARY KEY,
@@ -68,7 +69,8 @@ const createTablesQueries = [
   `CREATE TABLE IF NOT EXISTS cart_items (
         cart_item_id SERIAL PRIMARY KEY,
         cart_id INTEGER REFERENCES shopping_carts(cart_id),
-        game_id INTEGER REFERENCES games(game_id)
+        game_id INTEGER REFERENCES games(game_id),
+        quantity INTEGER
     )`,
 ];
 

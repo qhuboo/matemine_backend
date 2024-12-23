@@ -29,8 +29,6 @@ async function createUser({ firstName, lastName, email, hash }) {
 
     const user = await getUser(email);
 
-    console.log(user);
-
     const createdUserCart = cart.addCart(user.user_id);
     if (result.length > 0) {
       return result[0];

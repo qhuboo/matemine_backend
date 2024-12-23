@@ -152,11 +152,11 @@ async function getPlatformId(platform_name) {
   }
 }
 
-async function getGameScreenshots(game_id) {
+async function getGameScreenshots(gameId) {
   try {
     const screenshots = await db.query(
-      "SELECT g.game_id, g.description, g.title, g.price, g.sample_cover_image, gs.caption, gs.image FROM games g JOIN game_screenshots gs ON g.game_id = gs.game_id WHERE g.game_id = $1",
-      [game_id]
+      "SELECT * FROM game_screenshots WHERE game_id = $1",
+      [gameId]
     );
     return screenshots;
   } catch (err) {
