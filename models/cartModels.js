@@ -58,8 +58,8 @@ WHERE ci.cart_id = $1 ORDER BY g.title ASC`,
 async function insertGame(cartId, gameId, quantity) {
   try {
     const result = await db.query(
-      `UPDATE cart_items SET quantity = $1 WHERE cart_id = $2 AND game_id = $3 RETURNING *`,
-      [quantity, cartId, gameId]
+      `INSERT INTO cart_items (cart_id, game_id, quantity) VALUES($1, $2, $3) RETURNING *`,
+      [cartId, gameId, quantity]
     );
 
     if (result.length === 1) {

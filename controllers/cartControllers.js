@@ -10,8 +10,11 @@ async function addToCart(req, res, next) {
   if (!req.body.gameId && !req.body.quantity) {
     return res.status(400).json({ message: "Bad request" });
   }
-  const { gameId, quantity } = req.body;
+  const gameId = Number(req.body.gameId);
+  const quantity = Number(req.body.quantity);
+
   const { userId } = req.user;
+
   const cartId = await getCartId(userId);
   const cartItems = await getCartItems(cartId);
 
@@ -28,12 +31,18 @@ async function addToCart(req, res, next) {
     const gameToUpdate = cartItems.find((game) => game.game_id === gameId);
     let updateQuantity = Number(quantity) + Number(gameToUpdate.quantity);
     if (cartId) {
-      const insert = await insertGame(cartId, gameId, updateQuantity);
+      const insert = await changeGameQuantity(cartId, gameId, updateQuantity);
       if (insert) {
-        return res.json({ message: "The game was entered" });
+        return res.json({ message: "Game was added" });
       }
     }
+  } else {
+    const insert = await insertGame(cartId, gameId, quantity);
+    if (insert) {
+      return res.json({ message: "Game was added" });
+    }
   }
+  return res.json({ message: "Something went wrong" });
 }
 
 async function getCart(req, res, next) {
@@ -45,24 +54,26 @@ async function getCart(req, res, next) {
 
 async function changeGameQuantityController(req, res, next) {
   if (!req?.body?.gameId && !req?.body?.quantity) {
+    console.log("Deep in heo");
     return res.status(400).json({ message: "Bad request" });
   }
-  const { gameId, quantity } = req.body;
+  const gameId = Number(req.body.gameId);
+  const quantity = Number(req.body.quantity);
 
   const { userId } = req.user;
   const cartId = await getCartId(userId);
   const cartItems = await getCartItems(cartId);
-  // console.log(cartItems);
+
   const gameToChange = cartItems.find(
     (cartGame) => cartGame.game_id === Number(gameId)
   );
   if (gameToChange) {
-    const newGame = { ...gameToChange, quantity: Number(quantity) };
-    const insert = await insertGame(cartId, gameId, quantity);
+    const insert = await changeGameQuantity(cartId, gameId, quantity);
     if (insert) {
-      res.json({ message: "The quantity was updated" });
+      return res.json({ message: "The quantity was updated" });
     }
   }
+  return res.json({ message: "There was an error" });
 }
 
 async function removeFromCartController(req, res, next) {

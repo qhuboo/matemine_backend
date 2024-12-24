@@ -6,6 +6,7 @@ async function tokenAuthMiddlware(req, res, next) {
   try {
     const authHeaders = req.headers.authorization;
     if (!authHeaders?.startsWith("Bearer ")) {
+      console.log("In heo");
       return res.status(401).json({ message: "No token provided" });
     }
 
