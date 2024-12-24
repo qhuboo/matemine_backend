@@ -54,7 +54,6 @@ async function getCart(req, res, next) {
 
 async function changeGameQuantityController(req, res, next) {
   if (!req?.body?.gameId && !req?.body?.quantity) {
-    console.log("Deep in heo");
     return res.status(400).json({ message: "Bad request" });
   }
   const gameId = Number(req.body.gameId);
