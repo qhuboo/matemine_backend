@@ -19,7 +19,6 @@ const cookieOptions = {
   sameSite: "strict",
   maxAge: 24 * 60 * 60 * 1000,
   path: "/",
-  domain: "localhost",
 };
 
 async function registerUser(req, res, next) {
