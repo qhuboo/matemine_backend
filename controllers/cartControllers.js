@@ -7,6 +7,7 @@ const {
 } = require("../models/cartModels");
 
 async function addToCart(req, res, next) {
+  // console.log("addToCart");
   if (!req.body.gameId && !req.body.quantity) {
     return res.status(400).json({ message: "Bad request" });
   }
@@ -46,6 +47,7 @@ async function addToCart(req, res, next) {
 }
 
 async function getCart(req, res, next) {
+  // console.log("getCart");
   const { userId } = req.user;
   const cartId = await getCartId(userId);
   const cartItems = await getCartItems(cartId);
@@ -53,6 +55,7 @@ async function getCart(req, res, next) {
 }
 
 async function changeGameQuantityController(req, res, next) {
+  // console.log("changeGameQuantityController");
   if (!req?.body?.gameId && !req?.body?.quantity) {
     return res.status(400).json({ message: "Bad request" });
   }
@@ -76,6 +79,7 @@ async function changeGameQuantityController(req, res, next) {
 }
 
 async function removeFromCartController(req, res, next) {
+  // console.log("removeFromCartController");
   if (!req?.body?.gameId) {
     return res.status(400).json({ message: "Bad request" });
   }
