@@ -94,10 +94,61 @@ async function removeGameFromCart(cartId, gameId) {
       `DELETE FROM cart_items WHERE cart_id = $1 AND game_id = $2 RETURNING *`,
       [cartId, gameId]
     );
-    if (result.length > 0) {
+    if (result.length === 1) {
       return true;
     }
     return false;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function calculateCartTotal(cartId) {
+  try {
+    const cartItems = await getCartItems(cartId);
+    if (cartItems.length > 0) {
+      const total = cartItems.reduce((accumulatedCost, currentGame) => {
+        return (
+          accumulatedCost +
+          Number(currentGame.quantity) * parseFloat(currentGame.price)
+        );
+      }, 0);
+
+      return total;
+    }
+    return 0;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function clearCartPaymentIntent(paymentIntentId) {
+  try {
+    // console.log("clearCartPaymentIntent");
+    const cartResult = await db.query(
+      "SELECT cart_id FROM payment_intents WHERE id = $1",
+      [paymentIntentId]
+    );
+    if (cartResult.length === 1) {
+      console.log(cartResult);
+      const cartId = cartResult[0].cart_id;
+      console.log("cartId: ", cartId);
+      const result = await db.query(
+        "DELETE FROM cart_items WHERE cart_id = $1 RETURNING *",
+        [cartId]
+      );
+      if (result.length > 0) {
+        console.log("Deleting items:");
+        console.log(result);
+        return true;
+      } else {
+        console.log("Error deleting items from cart");
+        return false;
+      }
+    } else {
+      console.log("Error getting the cart id from the payment intent");
+      return false;
+    }
   } catch (error) {
     console.log(error);
   }
@@ -110,4 +161,6 @@ module.exports = {
   insertGame,
   changeGameQuantity,
   removeGameFromCart,
+  calculateCartTotal,
+  clearCartPaymentIntent,
 };

@@ -1,6 +1,8 @@
 const db = require("../db/db-pool");
+const config = require("../config");
 const { DatabaseError } = require("../errorTypes");
 const cart = require("../models/cartModels");
+const stripe = require("stripe")(config.stripeSecretKey);
 
 async function getUser(email) {
   try {
@@ -22,18 +24,26 @@ async function getUser(email) {
 
 async function createUser({ firstName, lastName, email, hash }) {
   try {
-    const result = await db.query(
-      "INSERT INTO users (first_name, last_name, email, password) VALUES ($1, $2, $3, $4) RETURNING *",
-      [firstName, lastName, email, hash]
-    );
+    // Create stripe customer
+    const stripeCustomer = await stripe.customers.create({
+      name: `${firstName} ${lastName}`,
+      email,
+    });
 
-    const user = await getUser(email);
+    if (stripeCustomer) {
+      const result = await db.query(
+        "INSERT INTO users (first_name, last_name, email, password, stripe_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        [firstName, lastName, email, hash, stripeCustomer.id]
+      );
 
-    const createdUserCart = cart.addCart(user.user_id);
-    if (result.length > 0) {
-      return result[0];
-    } else {
-      return undefined;
+      const user = await getUser(email);
+
+      const createdUserCart = cart.addCart(user.user_id);
+      if (result.length > 0) {
+        return result[0];
+      } else {
+        return undefined;
+      }
     }
   } catch (err) {
     console.log(err.code);

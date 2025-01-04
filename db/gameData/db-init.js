@@ -9,6 +9,7 @@ const createTablesQueries = [
         last_name VARCHAR(255),
         email VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
+        stripe_id TEXT UNIQUE,
         admin BOOLEAN DEFAULT false,
         token_version INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -65,6 +66,12 @@ const createTablesQueries = [
   `CREATE TABLE IF NOT EXISTS shopping_carts (
         cart_id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(user_id)
+    )`,
+  `
+    CREATE TABLE IF NOT EXISTS payment_intents(
+      id TEXT PRIMARY KEY,
+      cart_id INTEGER UNIQUE REFERENCES shopping_carts(cart_id),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`,
   `CREATE TABLE IF NOT EXISTS cart_items (
         cart_item_id SERIAL PRIMARY KEY,

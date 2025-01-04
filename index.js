@@ -13,6 +13,8 @@ const PORT = config.port || 3000;
 const games = require("./routes/gameRoutes");
 const auth = require("./routes/authRoutes");
 const cart = require("./routes/cartRoutes");
+const stripe = require("./routes/stripeRoutes");
+const stripeWebhook = require("./routes/stripeWebhook");
 
 const tokenAuthMiddleware = require("./middleware/tokenAuthMiddleware");
 const { globalErrorHandler } = require("./globalErrorHandler");
@@ -43,6 +45,8 @@ app.use(
   })
 );
 
+app.use("/stripe-webhook", stripeWebhook);
+
 app.use(express.json());
 
 app.use(cookieParser(config.cookieSecret));
@@ -62,10 +66,7 @@ app.get("/", async (req, res) => {
 app.use("/games", games);
 app.use("/auth", auth);
 app.use("/cart", tokenAuthMiddleware, cart);
-app.post("/protected", tokenAuthMiddleware, (req, res) => {
-  console.log("Got into the protected route");
-  return res.json({ message: "Got into the protected route" });
-});
+app.use("/stripe", tokenAuthMiddleware, stripe);
 
 // 404
 app.use((req, res) => {

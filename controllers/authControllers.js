@@ -155,6 +155,7 @@ async function logoutUser(req, res, next) {
 }
 
 async function refreshTokens(req, res, next) {
+  console.log("refreshToken");
   // Check if the request body contains a refresh token and email
   if (req.signedCookies.refreshToken && req.body.email) {
     // Get the refresh token and email

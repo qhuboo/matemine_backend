@@ -10,6 +10,10 @@ const config = {
   refreshTokenExpiry: process.env.REFRESH_TOKEN_EXPIRY,
   cookieSecret: process.env.COOKIE_SECRET,
   nodeEnv: process.env.NODE_ENV,
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+  stripeTestClientSecret: process.env.STRIPE_TEST_CLIENT_SECRET,
+  stripeTestPaymentIntentId: process.env.STRIPE_TEST_PAYMENT_INTENT_ID,
+  stripeTestWebhookSecret: process.env.STRIPE_TEST_WEBHOOK_SECRET,
 };
 
 module.exports = config;
