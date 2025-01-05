@@ -130,16 +130,12 @@ async function clearCartPaymentIntent(paymentIntentId) {
       [paymentIntentId]
     );
     if (cartResult.length === 1) {
-      console.log(cartResult);
       const cartId = cartResult[0].cart_id;
-      console.log("cartId: ", cartId);
       const result = await db.query(
         "DELETE FROM cart_items WHERE cart_id = $1 RETURNING *",
         [cartId]
       );
       if (result.length > 0) {
-        console.log("Deleting items:");
-        console.log(result);
         return true;
       } else {
         console.log("Error deleting items from cart");

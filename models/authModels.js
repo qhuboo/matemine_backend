@@ -32,7 +32,7 @@ async function createUser({ firstName, lastName, email, hash }) {
 
     if (stripeCustomer) {
       const result = await db.query(
-        "INSERT INTO users (first_name, last_name, email, password, stripe_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        "INSERT INTO users (first_name, last_name, email, password, stripe_customer_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
         [firstName, lastName, email, hash, stripeCustomer.id]
       );
 

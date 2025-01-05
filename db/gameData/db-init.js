@@ -9,7 +9,7 @@ const createTablesQueries = [
         last_name VARCHAR(255),
         email VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
-        stripe_id TEXT UNIQUE,
+        stripe_customer_id TEXT UNIQUE,
         admin BOOLEAN DEFAULT false,
         token_version INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -52,10 +52,12 @@ const createTablesQueries = [
   `CREATE TYPE order_status AS ENUM ('Pending', 'Shipped', 'Delivered', 'Cancelled')`,
   `CREATE TABLE IF NOT EXISTS orders (
         order_id SERIAL PRIMARY KEY,
-        user_id INTEGER REFERENCES users(user_id),
+        stripe_customer_id TEXT REFERENCES users(stripe_customer_id),
         order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        total_price DECIMAL(10, 2),
-        order_status VARCHAR(50) DEFAULT 'Pending'
+        total_price INTEGER NOT NULL,
+        order_status VARCHAR(50) DEFAULT 'Pending',
+        payment_intent_id TEXT,
+        receipt_url TEXT
     )`,
   `CREATE TABLE IF NOT EXISTS order_items (
         order_item_id SERIAL PRIMARY KEY,

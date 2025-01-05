@@ -8,9 +8,9 @@ const client = require("./db/gameData/db-client");
 
     // Example: Select all rows from a table
     const { rows } = await client.query(
-      "SELECT stripe_id FROM users WHERE user_id = 1"
+      "SELECT game_id, quantity FROM cart_items WHERE cart_id = 1"
     );
-    console.log(rows[0].stripe_id);
+    console.log(rows);
   } catch (err) {
     console.error("Error executing query:", err);
   } finally {

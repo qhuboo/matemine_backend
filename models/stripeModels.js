@@ -120,17 +120,17 @@ async function updatePaymentIntent(userId, paymentIntentId) {
 
       // Cancel all payment intents
       paymentIntents.forEach(async (paymentIntent) => {
-        console.log("Canceling: ", paymentIntent.id);
+        // console.log("Canceling: ", paymentIntent.id);
         const result = await stripe.paymentIntents.cancel(paymentIntent.id);
         if (result) {
-          console.log("Canceled: ", paymentIntent.id);
+          // console.log("Canceled: ", paymentIntent.id);
         }
       });
 
       // Delete all payment intents from the database
       const result = await deleteAllPaymentIntentsDB(cartId);
       if (result) {
-        console.log(result);
+        // console.log(result);
         return true;
       } else {
         return false;
@@ -160,11 +160,11 @@ async function updatePaymentIntent(userId, paymentIntentId) {
 async function getStripeCustomerId(userId) {
   try {
     const result = await db.query(
-      `SELECT stripe_id FROM users WHERE user_id = $1`,
+      `SELECT stripe_customer_id FROM users WHERE user_id = $1`,
       [userId]
     );
     if (result.length === 1) {
-      return result[0].stripe_id;
+      return result[0].stripe_customer_id;
     }
     return undefined;
   } catch (error) {

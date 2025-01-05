@@ -4,12 +4,14 @@ const config = require("../config");
 const stripe = require("stripe")(config.stripeSecretKey);
 const stripeModels = require("../models/stripeModels");
 const cartModels = require("../models/cartModels");
+const orderModels = require("../models/orderModels");
 
 router.post(
   "/",
   express.raw({ type: "application/json" }),
   async (req, res) => {
     console.log("************** WEB HOOK ********************");
+    res.json({ received: true });
     let event = req.body;
     if (config.stripeTestWebhookSecret) {
       const signature = req.headers["stripe-signature"];
@@ -28,17 +30,37 @@ router.post(
       // Handle the event
       switch (event.type) {
         case "payment_intent.succeeded":
-          // console.log("************ Payment intent succeeded **************");
+          console.log("************ Payment intent succeeded **************");
           const paymentIntent = event.data.object;
-          const clearCart = await cartModels.clearCartPaymentIntent(
-            paymentIntent.id
+          // Use the latest charge object to get the receipt_url
+          const latestCharge = await stripe.charges.retrieve(
+            paymentIntent.latest_charge
           );
-          const deletePaymentIntent = await stripeModels.deletePaymentIntentDB(
-            paymentIntent.id
-          );
-          if (clearCart && deletePaymentIntent) {
-            // console.log("The cart and payment intent have been reset");
-            console.log(paymentIntent);
+          if (latestCharge) {
+            // If their is a latest charge create the order
+            const createOrder = await orderModels.createOrder(
+              paymentIntent.customer,
+              paymentIntent.amount,
+              paymentIntent.id,
+              latestCharge.receipt_url
+            );
+            // If the order is successfully created, insert all the cart items into the order items table
+            if (createOrder) {
+              const insertOrderItems = orderModels.insertOrderItems(
+                paymentIntent.customer,
+                createOrder.id
+              );
+              if (insertOrderItems) {
+                const clearCart = await cartModels.clearCartPaymentIntent(
+                  paymentIntent.id
+                );
+                const deletePaymentIntent =
+                  await stripeModels.deletePaymentIntentDB(paymentIntent.id);
+                if (clearCart && deletePaymentIntent) {
+                  return;
+                }
+              }
+            }
           }
           break;
         case "payment_intent.created":
@@ -46,7 +68,6 @@ router.post(
           break;
       }
     }
-    res.json({ received: true });
   }
 );
 
