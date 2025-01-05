@@ -67,12 +67,40 @@ async function getAllOrders(userId) {
       `SELECT stripe_customer_id FROM users WHERE user_id = $1`,
       [userId]
     );
-    if (stripeCustomerId.length === 1) {
+    if (stripeCustomerIdResult.length === 1) {
       const stripeCustomerId = stripeCustomerIdResult[0].stripe_customer_id;
+      const items = await db.query(
+        `SELECT 
+    o.order_id,
+    o.order_date,
+    o.total_price,
+    o.order_status,
+    o.receipt_url,
+    COALESCE(
+        json_agg(
+            json_build_object(
+                'game_id', oi.game_id,
+                'quantity', oi.quantity,
+                'title', g.title,
+                'price', g.price,
+                'sample_cover_thumbnail', g.sample_cover_thumbnail
+            )
+        ) FILTER (WHERE oi.order_item_id IS NOT NULL),
+        '[]'
+    ) as items
+FROM orders o
+LEFT JOIN order_items oi ON o.order_id = oi.order_id
+LEFT JOIN games g ON oi.game_id = g.game_id
+WHERE o.stripe_customer_id = $1
+GROUP BY o.order_id
+ORDER BY o.order_date DESC;`,
+        [stripeCustomerId]
+      );
+      return items.length > 0 ? items : [];
     }
   } catch (error) {
     console.log(error);
   }
 }
 
-module.exports = { createOrder, insertOrderItems };
+module.exports = { createOrder, insertOrderItems, getAllOrders };

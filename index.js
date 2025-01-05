@@ -15,6 +15,7 @@ const auth = require("./routes/authRoutes");
 const cart = require("./routes/cartRoutes");
 const stripe = require("./routes/stripeRoutes");
 const stripeWebhook = require("./routes/stripeWebhook");
+const orders = require("./routes/orderRoutes");
 
 const tokenAuthMiddleware = require("./middleware/tokenAuthMiddleware");
 const { globalErrorHandler } = require("./globalErrorHandler");
@@ -67,6 +68,7 @@ app.use("/games", games);
 app.use("/auth", auth);
 app.use("/cart", tokenAuthMiddleware, cart);
 app.use("/stripe", tokenAuthMiddleware, stripe);
+app.use("/orders", tokenAuthMiddleware, orders);
 
 // 404
 app.use((req, res) => {

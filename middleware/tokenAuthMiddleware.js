@@ -3,7 +3,6 @@ const config = require("../config");
 const { getUser } = require("../models/authModels");
 
 async function tokenAuthMiddleware(req, res, next) {
-  // console.log("tokenAuthMiddleware");
   try {
     const authHeaders = req.headers.authorization;
     if (!authHeaders?.startsWith("Bearer ")) {

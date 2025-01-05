@@ -48,7 +48,7 @@ router.post(
             if (createOrder) {
               const insertOrderItems = orderModels.insertOrderItems(
                 paymentIntent.customer,
-                createOrder.id
+                createOrder.order_id
               );
               if (insertOrderItems) {
                 const clearCart = await cartModels.clearCartPaymentIntent(
