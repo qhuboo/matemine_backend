@@ -151,11 +151,14 @@ app.get("/", async (req, res) => {
 {
   "games": [
     {
-      "game_id": 1,
-      "title": "Game Title",
-      "rating": 4.5,
-      "price": 59.99,
-      "platforms": ["Nintendo Switch", "Xbox Series"]
+      "game_id": 500,
+      "title": "Star Wars: Dark Forces",
+      "description": "Kyle Katarn is a former Imperial officer turned mercenary, now hired by the Rebel Alliance. After having stolen the Death Star plans ...",
+      "price": "36.31",
+      "rating": "7.90",
+      "sample_cover_image": "https://cdn.mobygames.com/covers/4144523-star-wars-dark-forces-dos-front-cover.jpg",
+      "sample_cover_thumbnail": "https://cdn.mobygames.com/64f827c0-aba7-11ed-99ae-02420a00019e.webp",
+      "available": true
     },
     ...
   ],
@@ -183,13 +186,9 @@ app.get("/", async (req, res) => {
       
       <div class="section">
         <h2>Error Handling</h2>
-        <p>If an invalid parameter value is provided (e.g., unsupported <code>sort</code> option), the server will respond with:</p>
-        <pre>
-400 Bad Request
-{
-  "error": "Invalid sort parameter"
-}
-        </pre>
+        <p>If an invalid parameter value is provided (e.g., unsupported <code>sort</code> option), the server will replace it with the default value,
+        <code>alpha-desc</code> in this case.</p>
+ 
         <p>If no games match the specified filters, the server will return an empty response:</p>
         <pre>
 {
