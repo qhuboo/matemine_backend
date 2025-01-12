@@ -1,4 +1,3 @@
-const { query } = require("express");
 const client = require("./db-client");
 const seed = require("./seedGameData");
 

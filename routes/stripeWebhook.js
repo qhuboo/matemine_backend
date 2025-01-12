@@ -37,7 +37,7 @@ router.post(
             paymentIntent.latest_charge
           );
           if (latestCharge) {
-            // If their is a latest charge create the order
+            // If there is a latest charge create the order
             const createOrder = await orderModels.createOrder(
               paymentIntent.customer,
               paymentIntent.amount,
