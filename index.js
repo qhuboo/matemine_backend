@@ -61,7 +61,55 @@ app.use((err, req, res, next) => {
 });
 
 app.get("/", async (req, res) => {
-  res.send("Hello");
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>API Documentation</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
+        h1 { color: #333; }
+        pre { background: #f4f4f4; padding: 10px; border: 1px solid #ddd; overflow-x: auto; }
+        ul { list-style: none; padding: 0; }
+        ul li { margin-bottom: 10px; }
+        code { background: #eee; padding: 2px 4px; border-radius: 3px; }
+      </style>
+    </head>
+    <body>
+      <h1>API Documentation for /games</h1>
+      <h2>Endpoint</h2>
+      <p><code>GET /games</code></p>
+      <h2>Description</h2>
+      <p>This endpoint retrieves a list of games based on the provided filters, pagination, and sorting options.</p>
+      <h2>Query Parameters</h2>
+      <h3>Filter Parameters</h3>
+      <ul>
+        <li><code>nintendo</code>: Comma-separated list of Nintendo consoles.</li>
+        <li><code>sega</code>: Comma-separated list of SEGA consoles.</li>
+        <li><code>playstation</code>: Comma-separated list of PlayStation consoles.</li>
+        <li><code>xbox</code>: Comma-separated list of Xbox consoles.</li>
+      </ul>
+      <h3>Pagination Parameters</h3>
+      <ul>
+        <li><code>perPage</code>: Number of games per page (valid: 12, 24, 48, 76).</li>
+        <li><code>page</code>: Page number (must be a positive integer).</li>
+      </ul>
+      <h3>Sorting Parameters</h3>
+      <ul>
+        <li><code>sort</code>: Sorting options (e.g., <code>alpha-asc</code>, <code>rating-desc</code>, etc.).</li>
+      </ul>
+      <h2>Response Format</h2>
+      <pre>
+{
+  "games": [
+    { "game_id": 1, "title": "Game Title", "rating": 4.5, "price": 59.99, "platforms": ["Nintendo Switch", "Xbox Series"] }
+  ],
+  "totalPages": 10
+}
+      </pre>
+    </body>
+    </html>
+  `);
 });
 
 app.use("/games", games);
