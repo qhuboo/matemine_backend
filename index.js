@@ -110,7 +110,7 @@ app.get("/", async (req, res) => {
 ?xbox=Xbox,Xbox%20Series
         </pre>
       </div>
-      
+    
       <div class="section">
         <h3>Pagination Parameters</h3>
         <ul>
