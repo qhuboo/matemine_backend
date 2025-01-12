@@ -65,7 +65,7 @@ app.get("/", async (req, res) => {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>API Documentation</title>
+      <title>Matemine.shop API Documentation</title>
       <style>
         body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }
         h1 { color: #333; }
@@ -73,40 +73,131 @@ app.get("/", async (req, res) => {
         ul { list-style: none; padding: 0; }
         ul li { margin-bottom: 10px; }
         code { background: #eee; padding: 2px 4px; border-radius: 3px; }
+        .section { margin-bottom: 30px; }
       </style>
     </head>
     <body>
-      <h1>API Documentation for /games</h1>
-      <h2>Endpoint</h2>
-      <p><code>GET /games</code></p>
-      <h2>Description</h2>
-      <p>This endpoint retrieves a list of games based on the provided filters, pagination, and sorting options.</p>
-      <h2>Query Parameters</h2>
-      <h3>Filter Parameters</h3>
-      <ul>
-        <li><code>nintendo</code>: Comma-separated list of Nintendo consoles.</li>
-        <li><code>sega</code>: Comma-separated list of SEGA consoles.</li>
-        <li><code>playstation</code>: Comma-separated list of PlayStation consoles.</li>
-        <li><code>xbox</code>: Comma-separated list of Xbox consoles.</li>
-      </ul>
-      <h3>Pagination Parameters</h3>
-      <ul>
-        <li><code>perPage</code>: Number of games per page (valid: 12, 24, 48, 76).</li>
-        <li><code>page</code>: Page number (must be a positive integer).</li>
-      </ul>
-      <h3>Sorting Parameters</h3>
-      <ul>
-        <li><code>sort</code>: Sorting options (e.g., <code>alpha-asc</code>, <code>rating-desc</code>, etc.).</li>
-      </ul>
-      <h2>Response Format</h2>
-      <pre>
+      <h1>Welcome to the Matemine.shop API!</h1>
+      <p>This is the official API for the <strong>Matemine.shop</strong> marketplace, where you can browse and access data about video games.</p>
+      <p>Our data is sourced from <strong>Moby Games</strong>, and most routes in this API require <strong>token authentication</strong> for security. However, the <code>/games</code> route can be accessed directly from the browser without authentication.</p>
+      <p>Below, you'll find documentation for the <code>/games</code> route, including how to use its query parameters to filter, sort, and paginate your search results.</p>
+
+      <div class="section">
+        <h2>Endpoint</h2>
+        <p><code>GET /games</code></p>
+      </div>
+      
+      <div class="section">
+        <h2>Description</h2>
+        <p>This endpoint retrieves a list of games based on the provided filters, pagination, and sorting options.</p>
+      </div>
+      
+      <div class="section">
+        <h2>Query Parameters</h2>
+        
+        <h3>Filter Parameters</h3>
+        <ul>
+          <li><code>nintendo</code>: Specify a comma-separated list of Nintendo consoles (e.g., <code>SNES, Wii</code>).</li>
+          <li><code>sega</code>: Specify a comma-separated list of SEGA consoles (e.g., <code>Genesis, Dreamcast</code>).</li>
+          <li><code>playstation</code>: Specify a comma-separated list of PlayStation consoles (e.g., <code>PSP, PlayStation 5</code>).</li>
+          <li><code>xbox</code>: Specify a comma-separated list of Xbox consoles (e.g., <code>Xbox, Xbox Series</code>).</li>
+        </ul>
+        <p><strong>Examples:</strong></p>
+        <pre>
+?nintendo=SNES,Wii
+?sega=Genesis,Dreamcast
+?playstation=PlayStation%205,PSP
+?xbox=Xbox,Xbox%20Series
+        </pre>
+      </div>
+      
+      <div class="section">
+        <h3>Pagination Parameters</h3>
+        <ul>
+          <li><code>perPage</code>: The number of games per page. Valid values: <code>12</code>, <code>24</code>, <code>48</code>, <code>76</code>. Default: <code>12</code>.</li>
+          <li><code>page</code>: The page number to fetch. Must be a positive integer. Default: <code>1</code>.</li>
+        </ul>
+        <p><strong>Examples:</strong></p>
+        <pre>
+?perPage=24
+?page=2
+        </pre>
+      </div>
+      
+      <div class="section">
+        <h3>Sorting Parameters</h3>
+        <ul>
+          <li><code>sort</code>: Determines the sorting order of games. Valid values:
+            <ul>
+              <li><code>alpha-desc</code>: Sort by title in descending order (Z → A).</li>
+              <li><code>alpha-asc</code>: Sort by title in ascending order (A → Z).</li>
+              <li><code>rating-desc</code>: Sort by rating in descending order.</li>
+              <li><code>rating-asc</code>: Sort by rating in ascending order.</li>
+              <li><code>price-desc</code>: Sort by price in descending order (highest → lowest).</li>
+              <li><code>price-asc</code>: Sort by price in ascending order (lowest → highest).</li>
+            </ul>
+          </li>
+        </ul>
+        <p><strong>Examples:</strong></p>
+        <pre>
+?sort=rating-asc
+?sort=price-desc
+        </pre>
+      </div>
+      
+      <div class="section">
+        <h2>Response Format</h2>
+        <pre>
 {
   "games": [
-    { "game_id": 1, "title": "Game Title", "rating": 4.5, "price": 59.99, "platforms": ["Nintendo Switch", "Xbox Series"] }
+    {
+      "game_id": 1,
+      "title": "Game Title",
+      "rating": 4.5,
+      "price": 59.99,
+      "platforms": ["Nintendo Switch", "Xbox Series"]
+    },
+    ...
   ],
   "totalPages": 10
 }
-      </pre>
+        </pre>
+      </div>
+      
+      <div class="section">
+        <h2>Example Requests</h2>
+        <ul>
+          <li>Get all games for Nintendo consoles (SNES, Wii) sorted by rating in ascending order:</li>
+          <pre>GET /games?nintendo=SNES,Wii&sort=rating-asc</pre>
+          
+          <li>Get PlayStation games (PS5, PSP) on page 2 with 24 results per page:</li>
+          <pre>GET /games?playstation=PlayStation%205,PSP&perPage=24&page=2</pre>
+          
+          <li>Get all Xbox games sorted by price in descending order:</li>
+          <pre>GET /games?xbox=Xbox,Xbox%20Series&sort=price-desc</pre>
+          
+          <li>Fetch games from multiple platforms (e.g., Nintendo Wii, Sega Genesis, Xbox Series):</li>
+          <pre>GET /games?nintendo=Wii&sega=Genesis&xbox=Xbox%20Series</pre>
+        </ul>
+      </div>
+      
+      <div class="section">
+        <h2>Error Handling</h2>
+        <p>If an invalid parameter value is provided (e.g., unsupported <code>sort</code> option), the server will respond with:</p>
+        <pre>
+400 Bad Request
+{
+  "error": "Invalid sort parameter"
+}
+        </pre>
+        <p>If no games match the specified filters, the server will return an empty response:</p>
+        <pre>
+{
+  "games": [],
+  "totalPages": 0
+}
+        </pre>
+      </div>
     </body>
     </html>
   `);
